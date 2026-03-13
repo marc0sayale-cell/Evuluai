@@ -1636,20 +1636,15 @@ function doneGen(i) {
 //  API ANTHROPIC
 // ═══════════════════════════════════════════════════════════════
 // ── AI PROXY CONFIG ───────────────────────────────────────────
-// Para produção: crie /api/ai em Vercel/Netlify e mova a key para env vars.
-// Enquanto em dev/GitHub Pages, usa direct browser access (aceito pela Anthropic para demos).
+// Proxy Cloudflare Worker (gratuito): ver RIMU-IO-MASTER-PROMPT.md
+// Se _AI_PROXY estiver definido, usa o proxy. Senão, tenta direto (só funciona no claude.ai).
 const _AI_CFG = {
-  endpoint: window._AI_PROXY || 'https://api.anthropic.com/v1/messages',
-  useProxy: !!window._AI_PROXY,
+  endpoint: window._AI_PROXY || 'https://rimu-proxy.marcosayale.workers.dev',
+  useProxy: true, // sempre usa proxy — evita CORS em qualquer host
 };
 
 async function callAI(prompt, maxTok=2000) {
   const headers = { 'Content-Type':'application/json' };
-  if (!_AI_CFG.useProxy) {
-    headers['x-api-key'] = atob('c2stYW50LWFwaTA'+'zLWJweEJBSDdfVS1SZlY5UjNQV0FxUjhjaT'+'M3bGQyR3o3ak5yMDJNa0pUSzd5Y19KOU51WV9HQ3VZVVlCaE9fSHdKclY3SG1t'+'V2I5aUwtSU5lSUhWRnVBLXdGXzZvQUFB');
-    headers['anthropic-version'] = '2023-06-01';
-    headers['anthropic-dangerous-direct-browser-access'] = 'true';
-  }
   const res = await fetch(_AI_CFG.endpoint, {
     method:'POST', headers,
     body: JSON.stringify({
@@ -1796,18 +1791,21 @@ function iniciarApp() {
 }
 
 async function gerarPlanosBackground(temDieta, temTreino) {
-  // Garante que U tem dados mínimos para gerar
-  if (!U.peso)     U.peso     = '75';
-  if (!U.metaPeso) U.metaPeso = '70';
-  if (!U.altura)   U.altura   = '170';
-  if (!U.idade)    U.idade    = 25;
-  if (!U.sexo)     U.sexo     = 'Não informado';
-  if (!U.objetivo) U.objetivo = 'Ganhar massa muscular';
-  if (!U.nivel)    U.nivel    = 'Intermediário';
-  if (!U.local)    U.local    = 'Academia';
-  if (!U.freq)     U.freq     = '3–4 dias/semana';
-  if (!U.dieta)    U.dieta    = 'Sem restrições';
-  if (!U.ngosta)   U.ngosta   = 'nada';
+  // Recarrega U do storage para ter dados mais atuais
+  const salvo = DB.get('u:'+U.email) || {};
+  Object.assign(U, salvo);
+  // Só preenche fallback se campo REALMENTE estiver vazio
+  U.peso     = U.peso     || '75';
+  U.metaPeso = U.metaPeso || '70';
+  U.altura   = U.altura   || '170';
+  U.idade    = U.idade    || 25;
+  U.sexo     = U.sexo     || 'Não informado';
+  U.objetivo = U.objetivo || 'Ganhar massa muscular';
+  U.nivel    = U.nivel    || 'Intermediário';
+  U.local    = U.local    || 'Academia';
+  U.freq     = U.freq     || '3–4 dias/semana';
+  U.dieta    = U.dieta    || 'Sem restrições';
+  U.ngosta   = U.ngosta   || 'nada';
 
   toast('⏳ Gerando seu plano personalizado...', 'ok');
 

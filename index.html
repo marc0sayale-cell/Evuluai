@@ -2479,19 +2479,33 @@ function initPWA(){
   const icon=makeIcon(192);
   const al=document.getElementById('appleIcon'); if(al) al.href=icon;
   const manifest={name:'Rimu.io',short_name:'Rimu',description:'Dieta, Treino e Finanças com IA',
-    start_url:'./',display:'standalone',background_color:'#08070d',theme_color:'#08070d',orientation:'portrait',
-    icons:[{src:icon,sizes:'192x192',type:'image/svg+xml',purpose:'any maskable'},{src:makeIcon(512),sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+    start_url:'./',display:'standalone',background_color:'#030711',theme_color:'#030711',orientation:'portrait',
+    icons:[
+      {src:'./icon-192.svg',sizes:'192x192',type:'image/svg+xml',purpose:'any'},
+      {src:'./icon-512.svg',sizes:'512x512',type:'image/svg+xml',purpose:'any'},
+      {src:icon,sizes:'192x192',type:'image/svg+xml',purpose:'maskable'}
+    ]};
   const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
   const lnk=document.getElementById('pwaManifest'); if(lnk) lnk.href=URL.createObjectURL(blob);
-  if('serviceWorker' in navigator){
-    // Limpar SWs antigos primeiro para evitar cache de versões antigas
-    navigator.serviceWorker.getRegistrations().then(regs => {
-      regs.forEach(r => r.unregister());
-    });
-    const sw=`const C='rimu-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.add('/')));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));});self.addEventListener('fetch',e=>e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok)c.put(e.request,res.clone());return res;}).catch(()=>r)))))`;
-    setTimeout(()=>{
-      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
-    }, 2000);
+  if ('serviceWorker' in navigator) {
+    // Não registra SW em preview/dev (claudeusercontent, localhost sem sw.js)
+    const isGitHubPages = location.hostname.includes('github.io');
+    const isLocalDev    = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!isGitHubPages && !isLocalDev) {
+      
+    } else {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(reg => {
+          console.log('[SW] Registrado com sucesso:', reg.scope);
+          window._swReg = reg;
+          // Captura registro já ativo
+          navigator.serviceWorker.ready.then(r => { window._swReg = r; });
+        })
+        .catch(err => {
+          // Só loga se não for 404 esperado
+          if (!err.message?.includes('404')) console.warn('[SW] Erro:', err.message);
+        });
+    }
   }
 }
 
@@ -2649,6 +2663,10 @@ async function pedirPermissao() {
   if (perm === 'granted') {
     document.getElementById('notifPermBlock').style.display = 'none';
     toast('Notificações ativadas! 🔔', 'ok');
+    // Capturar registro do SW após permissão concedida
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => { window._swReg = reg; });
+    }
     iniciarNotificacoes();
   } else if (perm === 'denied') {
     toast('Bloqueado! Ative nas configurações do navegador 🔕', 'err');
@@ -2675,7 +2693,30 @@ function saveNotifSettings() {
 }
 
 function enviarNotif(titulo, corpo, icone) {
+  // Tenta via Service Worker primeiro (funciona em PWA instalado/background)
+  const reg = window._swReg || (navigator.serviceWorker && navigator.serviceWorker.controller);
+  if (reg && reg.showNotification) {
+    reg.showNotification(titulo, {
+      body: corpo,
+      icon: icone || './icon-192.png',
+      badge: './icon-192.svg',
+      tag: 'rimu-' + Date.now(),
+      vibrate: [200, 100, 200],
+    }).catch(() => Notif.send(titulo, corpo, { icon: icone }));
+    return;
+  }
+  // Fallback: Notification API direta (funciona em foreground)
   Notif.send(titulo, corpo, { icon: icone });
+}
+
+// Agenda notificação via SW (funciona mesmo com app minimizado)
+function agendarNotifSW(titulo, corpo, delayMs, tag) {
+  const ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+  if (ctrl) {
+    ctrl.postMessage({ type: 'SCHEDULE_NOTIF', title: titulo, body: corpo, delayMs, tag });
+    return true;
+  }
+  return false;
 }
 
 function iniciarNotificacoes() {

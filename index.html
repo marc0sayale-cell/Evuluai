@@ -386,7 +386,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <!-- SPLASH -->
 <div class="pg on" id="pgSp">
   <div class="sp-l">EVOLUAI<span style="-webkit-text-fill-color:var(--cyan);color:var(--cyan)">.</span></div>
-  <div class="sp-s">evolua com ia.</div>
+  <div class="sp-s">sua evolução começa aqui.</div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 
@@ -395,7 +395,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="auth-glow"></div>
   <div class="auth-hero">
     <div class="auth-logo">EVOLUAI<span style="-webkit-text-fill-color:var(--cyan);color:var(--cyan)">.</span></div>
-    <div class="auth-sub">Dieta · Treino · Finanças · Metas<br>Evolua com o poder da IA.</div>
+    <div class="auth-sub">Dieta · Treino · Finanças · Metas<br>Dieta · Treino · Finanças · Metas<br>Sua evolução começa aqui.</div>
     <div class="pills">
       <div class="pill">🔥 Déficit calórico</div><div class="pill">💪 Treinos IA</div>
       <div class="pill">💰 Finanças</div><div class="pill">🤖 AI Chat</div><div class="pill">📸 FotoCal</div>
@@ -1264,6 +1264,28 @@ const DB = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+//  MIGRAÇÃO DE KEYS — rimu_ → evo_ (versão antiga → nova)
+// ═══════════════════════════════════════════════════════════════
+function migrarKeysAntigas() {
+  if (localStorage.getItem('_evo_migrated')) return; // já migrou
+  let migrou = 0;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    if (key.startsWith('rimu_')) {
+      const novaKey = 'evo_' + key.slice(5);
+      // Só copia se a nova key não existir ainda
+      if (!localStorage.getItem(novaKey)) {
+        localStorage.setItem(novaKey, localStorage.getItem(key));
+        migrou++;
+      }
+    }
+  }
+  localStorage.setItem('_evo_migrated', '1');
+  if (migrou > 0) console.log('[Evoluai] Migradas', migrou, 'keys do localStorage');
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  CONTA MASTER — Marcos tem PRO grátis sempre
 // ═══════════════════════════════════════════════════════════════
 const MASTER = {
@@ -1295,6 +1317,7 @@ let obStep = 1;
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   preencherDatas();
+  migrarKeysAntigas(); // migra rimu_ → evo_ na primeira vez
   setTimeout(() => {
     document.getElementById('pgSp').classList.remove('on');
     const session = DB.get('session');
@@ -1668,24 +1691,66 @@ async function callAI(prompt, maxTok=2000) {
 }
 
 async function gerarDieta() {
+  // Recarrega dados do questionário do storage
+  const d = Object.assign({}, DB.get('u:'+U.email)||{}, U);
+  const peso     = d.peso     || '75';
+  const metaPeso = d.metaPeso || '70';
+  const altura   = d.altura   || '170';
+  const idade    = d.idade    || 25;
+  const sexo     = d.sexo     || 'Não informado';
+  const objetivo = d.objetivo || 'Ganhar massa muscular';
+  const freq     = d.freq     || '3-4 dias/semana';
+  const local    = d.local    || 'Academia';
+  const dieta    = d.dieta    || 'Sem restrições';
+  const ngosta   = d.ngosta   || 'nada';
   try {
-    const txt = await callAI(`Nutricionista especializado. Crie plano alimentar 7 dias para:
-Peso: ${U.peso}kg → meta: ${U.metaPeso}kg, Altura: ${U.altura}cm, Idade: ${U.idade}a, Sexo: ${U.sexo}
-Objetivo: ${U.objetivo}, Treino: ${U.freq}, Local: ${U.local}
-Dieta: ${U.dieta}, Não gosta: ${U.ngosta}
+    const txt = await callAI(`Nutricionista especializado. Crie plano alimentar 7 dias PERSONALIZADO:
+Peso: ${peso}kg → meta: ${metaPeso}kg | Altura: ${altura}cm | Idade: ${idade}a | Sexo: ${sexo}
+Objetivo: ${objetivo} | Treino: ${freq} | Local: ${local}
+Dieta: ${dieta} | Não gosta: ${ngosta}
 Retorne SOMENTE JSON válido sem markdown:
 {"meta_kcal":2200,"meta_prot":160,"meta_carbo":220,"meta_gord":65,"dias":[{"dia":"Segunda","ref":[{"tipo":"Café da manhã","nome":"Ovos mexidos","kcal":380,"prot":28,"carbo":30,"gord":14},{"tipo":"Almoço","nome":"Frango com arroz","kcal":580,"prot":50,"carbo":60,"gord":12},{"tipo":"Jantar","nome":"Atum com batata","kcal":480,"prot":42,"carbo":50,"gord":10},{"tipo":"Lanche","nome":"Iogurte grego","kcal":220,"prot":18,"carbo":22,"gord":5}]},{"dia":"Terça","ref":[...]},{"dia":"Quarta","ref":[...]},{"dia":"Quinta","ref":[...]},{"dia":"Sexta","ref":[...]},{"dia":"Sábado","ref":[...]},{"dia":"Domingo","ref":[...]}]}`);
-    return JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim());
+    return JSON.parse(txt.replace(/```json[\s\S]*?```|```/g,'').trim());
   } catch(e) { return fbDieta(); }
 }
 
 async function gerarTreino() {
+  // Recarrega dados do questionário do storage
+  const d = Object.assign({}, DB.get('u:'+U.email)||{}, U);
+  const objetivo = d.objetivo || 'Ganhar massa muscular';
+  const nivel    = d.nivel    || 'Intermediário';
+  const freq     = d.freq     || '3-4 dias/semana';
+  const local    = d.local    || 'Academia';
+  const peso     = d.peso     || '75';
+  const metaPeso = d.metaPeso || '70';
+  const idade    = d.idade    || 25;
+  const sexo     = d.sexo     || 'Não informado';
+  const diasNum  = freq.includes('5')||freq.includes('6') ? 5 : freq.includes('4') ? 4 : freq.includes('3') ? 3 : freq.includes('1') ? 2 : 3;
+  const localDica = (local==='Em casa'||local==='Casa') ? 'peso corporal, halteres leves, sem máquinas'
+    : (local==='Ao ar livre'||local==='Parque') ? 'calistenia, corrida, exercícios ao ar livre'
+    : (local==='Crossfit'||local==='Funcional') ? 'movimentos funcionais, kettlebell, barbell'
+    : 'academia completa com máquinas, halteres e cabos';
+  const nivelDica = nivel==='Iniciante' ? '2-3 séries, exercícios básicos, 90s descanso, foco em técnica'
+    : nivel==='Avançado' ? '4-5 séries, técnicas avançadas, supersets, 45-60s descanso'
+    : '3-4 séries, exercícios intermediários, 60-75s descanso';
+  const objDica = (objetivo.includes('gord')||objetivo.includes('perd')) ? 'circuito com pouco descanso, HIIT, cardio ao final, foco em queima calórica'
+    : (objetivo.includes('mass')||objetivo.includes('múscu')||objetivo.includes('hipert')) ? 'hipertrofia, cargas pesadas, isolação muscular, progressive overload'
+    : (objetivo.includes('condicion')) ? 'resistência cardiovascular, funcionais, intervalados'
+    : 'equilíbrio força e resistência, exercícios compostos';
   try {
-    const txt = await callAI(`Personal trainer. Crie plano treino semanal:
-Objetivo: ${U.objetivo}, Nível: ${U.nivel}, Frequência: ${U.freq}, Local: ${U.local}
-Retorne SOMENTE JSON válido sem markdown:
-{"dias":[{"dia":"Segunda","tipo":"treino","nome":"Peito e Tríceps","duracao":60,"exer":[{"nome":"Supino Reto","series":4,"reps":"10-12","descanso":"60s"}]},{"dia":"Terça","tipo":"treino","nome":"Costas","duracao":60,"exer":[...]},{"dia":"Quarta","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Quinta","tipo":"treino","nome":"Pernas","duracao":70,"exer":[...]},{"dia":"Sexta","tipo":"treino","nome":"Ombro","duracao":55,"exer":[...]},{"dia":"Sábado","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Domingo","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]}]}`);
-    return JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim());
+    const txt = await callAI(`Personal trainer expert. Crie plano de treino PERSONALIZADO para este aluno:
+
+DADOS: Objetivo=${objetivo} | Nível=${nivel} | Local=${local} | Frequência=${freq} | Peso=${peso}kg | Meta=${metaPeso}kg | Idade=${idade} | Sexo=${sexo}
+
+ADAPTAÇÕES OBRIGATÓRIAS:
+- Dias de treino: exatamente ${diasNum} dias, ${7-diasNum} descanso
+- Equipamentos: ${localDica}
+- Volume/intensidade: ${nivelDica}
+- Foco do treino: ${objDica}
+
+Retorne SOMENTE JSON sem markdown:
+{"dias":[{"dia":"Segunda","tipo":"treino","nome":"Peito e Tríceps","duracao":60,"exer":[{"nome":"Supino Reto","series":4,"reps":"10-12","descanso":"60s"}]},{"dia":"Terça","tipo":"treino","nome":"Costas e Bíceps","duracao":60,"exer":[...]},{"dia":"Quarta","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Quinta","tipo":"treino","nome":"Pernas","duracao":70,"exer":[...]},{"dia":"Sexta","tipo":"treino","nome":"Ombro e Abdômen","duracao":55,"exer":[...]},{"dia":"Sábado","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Domingo","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]}]}`, 2500);
+    return JSON.parse(txt.replace(/```json[\s\S]*?```|```/g,'').trim());
   } catch(e) { return fbTreino(); }
 }
 
@@ -2371,7 +2436,7 @@ async function genRecipe(){
   rr.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px"><div class="genSpin"></div><div style="font-size:13px;color:var(--dim)">Gerando receita...</div></div>`;
   try{
     const txt=await callAI(`Crie receita: "${goal}".${restr?' Restrições: '+restr:''}\nRetorne SOMENTE JSON sem markdown:\n{"nome":"...","tempo":"20 min","porcoes":2,"calorias":500,"tags":["Alta proteína"],"macros":{"proteina":"40g","carboidrato":"50g","gordura":"12g"},"ingredientes":[{"item":"Frango","qtd":"300g"}],"passos":["Tempere o frango..."]}`);
-    showRecipe(JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim()));
+    showRecipe(JSON.parse(txt.replace(/```json[\s\S]*?```|```/g,'').trim()));
   } catch(e){
     showRecipe({nome:'Bowl Proteico Evoluai',tempo:'20 min',porcoes:2,calorias:480,tags:['Alta proteína','Pós-treino'],
       macros:{proteina:'42g',carboidrato:'38g',gordura:'12g'},

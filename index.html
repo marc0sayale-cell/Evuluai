@@ -986,6 +986,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
         <!-- AÇÕES -->
         <div style="background:var(--glass);border:1px solid var(--bd);border-radius:14px;overflow:hidden">
+          <div id="installAppRow" onclick="doInstall()" style="display:flex;align-items:center;justify-content:space-between;padding:17px 16px;border-bottom:1px solid var(--bd);cursor:pointer;background:rgba(103,58,183,.06)" ontouchstart="this.style.background='rgba(103,58,183,.14)'" ontouchend="this.style.background='rgba(103,58,183,.06)'">
+            <div style="font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--pur),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">📲 Instalar como App</div>
+            <span style="color:var(--pur)">›</span>
+          </div>
           <div onclick="doLogout()" style="display:flex;align-items:center;justify-content:space-between;padding:17px 16px;border-bottom:1px solid var(--bd);cursor:pointer" ontouchstart="this.style.background='rgba(103,58,183,.08)'" ontouchend="this.style.background='transparent'">
             <div style="font-size:15px;font-weight:600;color:var(--dim)">Sair da conta</div>
             <span style="color:var(--dim)">›</span>
@@ -2587,9 +2591,30 @@ function lockHTML(ttl,sub){
 function initPWA(){
   const icon=document.getElementById('_logoImg').src;
   const al=document.getElementById('appleIcon');if(al)al.href=icon;
-  const manifest={name:'Evoluai',short_name:'Evoluai',description:'Sua evolucao comeca aqui.',start_url:'./',display:'standalone',background_color:'#100319',theme_color:'#100319',orientation:'portrait',icons:[{src:icon,sizes:'192x192',type:'image/png',purpose:'any maskable'}]};
-  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  const lnk=document.getElementById('pwaManifest');if(lnk)lnk.href=URL.createObjectURL(blob);
+  // Ícones múltiplos tamanhos para melhor compatibilidade PWA
+  const manifest={
+    name:'Evoluai',
+    short_name:'Evoluai',
+    description:'Dieta, Treino, Financas e IA — sua evolucao comeca aqui.',
+    start_url:'./',
+    scope:'./',
+    display:'standalone',
+    background_color:'#100319',
+    theme_color:'#673AB7',
+    orientation:'portrait-primary',
+    lang:'pt-BR',
+    categories:['health','fitness','finance'],
+    icons:[
+      {src:icon,sizes:'192x192',type:'image/png',purpose:'any'},
+      {src:icon,sizes:'192x192',type:'image/png',purpose:'maskable'},
+      {src:icon,sizes:'512x512',type:'image/png',purpose:'any'},
+      {src:icon,sizes:'512x512',type:'image/png',purpose:'maskable'}
+    ]
+  };
+  // Usar data URI — funciona para PWA install no Chrome/Android
+  const manifestStr=JSON.stringify(manifest);
+  const manifestB64='data:application/manifest+json;base64,'+btoa(unescape(encodeURIComponent(manifestStr)));
+  const lnk=document.getElementById('pwaManifest');if(lnk)lnk.href=manifestB64;
   if('serviceWorker' in navigator){
     const sw='const C="evo-v5";self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener("fetch",e=>{if(e.request.url.includes("api.anthropic")||e.request.url.includes("firebase")||e.request.url.includes("googleapis"))return;e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok)c.put(e.request,res.clone());return res;}).catch(()=>r))));});self.addEventListener("message",e=>{if(e.data&&e.data.type==="SCHEDULE_NOTIF"){setTimeout(()=>{self.registration.showNotification(e.data.title,{body:e.data.body,tag:e.data.tag||"evo",vibrate:[200,100,200]});},e.data.delayMs||500);}});';
     navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).then(r=>{window._swReg=r;}).catch(()=>{});
@@ -2608,14 +2633,43 @@ function initPWA(){
 }
 
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;
-  const b=document.createElement('div');b.id='installBanner';
-  b.className='install-banner';
-  b.innerHTML='<img src="'+document.getElementById('_logoImg').src+'" style="width:40px;height:40px;border-radius:10px;object-fit:contain"><div style="flex:1"><div style="font-size:13px;font-weight:700">Instalar Evoluai</div><div style="font-size:11px;color:var(--dim);margin-top:2px">Adicionar a tela inicial</div></div><button onclick="doInstall()" style="background:linear-gradient(135deg,var(--pur),var(--mag));color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Rajdhani\',sans-serif">Instalar</button><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 2px">x</button>';
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  // Mostrar banner de instalação grande e chamativo
+  if(document.getElementById('installBanner')) return;
+  const b=document.createElement('div');
+  b.id='installBanner';
+  b.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1a0628,#2d0a4e);border-top:2px solid var(--pur);padding:18px 16px calc(20px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px;box-shadow:0 -8px 32px rgba(103,58,183,.5);animation:sUp .4s cubic-bezier(.22,1,.36,1)';
+  b.innerHTML=''
+    +'<img src="'+document.getElementById('_logoImg').src+'" style="width:52px;height:52px;border-radius:14px;object-fit:contain;box-shadow:0 4px 16px rgba(103,58,183,.5);flex-shrink:0">'
+    +'<div style="flex:1"><div style="font-size:15px;font-weight:800;color:white">Instalar Evoluai</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Adicionar na tela inicial como app</div></div>'
+    +'<button onclick="doInstall()" style="background:linear-gradient(135deg,var(--pur),var(--mag));color:#fff;border:none;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 4px 16px rgba(103,58,183,.5)">Instalar</button>'
+    +'<button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>';
   document.body.appendChild(b);
 });
-window.addEventListener('appinstalled',()=>{toast('Evoluai instalado!','ok');document.getElementById('installBanner')?.remove();});
-function doInstall(){document.getElementById('installBanner')?.remove();if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')toast('Evoluai instalado!','ok');deferredPrompt=null;});}}
+window.addEventListener('appinstalled',()=>{toast('Evoluai instalado! 🎉','ok');document.getElementById('installBanner')?.remove();document.getElementById('installAppRow')?.remove();deferredPrompt=null;});
+function doInstall(){
+  document.getElementById('installBanner')?.remove();
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r=>{
+      if(r.outcome==='accepted'){
+        toast('Evoluai instalado! 🎉','ok');
+        document.getElementById('installAppRow')?.remove();
+      }
+      deferredPrompt=null;
+    });
+  } else {
+    // Já instalado ou iOS
+    if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+      toast('No Safari: toque em Compartilhar → Adicionar à Tela Inicial','ok');
+    } else {
+      toast('Para instalar: menu do Chrome (⋮) → Instalar app','ok');
+    }
+  }
+}
 
 window.addEventListener('load',()=>{initPWA();});
 

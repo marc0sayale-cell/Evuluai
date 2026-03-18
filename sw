@@ -1,14 +1,31 @@
-const C='evo-v6';
-self.addEventListener('install',()=>self.skipWaiting());
-self.addEventListener('activate',e=>{
-  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+const CACHE = 'evo-v7';
+const SKIP = ['api.groq', 'api.anthropic', 'firebase', 'googleapis', 'workers.dev', 'cloudflare'];
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
 });
-self.addEventListener('fetch',e=>{
-  if(e.request.url.includes('api.anthropic')||e.request.url.includes('firebase')||e.request.url.includes('googleapis'))return;
-  e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok)c.put(e.request,res.clone());return res;}).catch(()=>r))));
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
-self.addEventListener('message',e=>{
-  if(e.data&&e.data.type==='SCHEDULE_NOTIF'){
-    setTimeout(()=>{self.registration.showNotification(e.data.title,{body:e.data.body,tag:e.data.tag||'evo',vibrate:[200,100,200]});},e.data.delayMs||500);
-  }
+
+self.addEventListener('fetch', e => {
+  if (SKIP.some(s => e.request.url.includes(s))) return;
+  if (e.request.method !== 'GET') return;
+
+  e.respondWith(
+    caches.open(CACHE).then(cache =>
+      cache.match(e.request).then(cached => {
+        const fresh = fetch(e.request).then(res => {
+          if (res && res.ok) cache.put(e.request, res.clone());
+          return res;
+        }).catch(() => cached);
+        return cached || fresh;
+      })
+    )
+  );
 });

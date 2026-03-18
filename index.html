@@ -818,28 +818,50 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       </div>
 
       <!-- RECEITAS -->
+            <!-- RECEITAS -->
       <div class="scr" id="scr-receitas">
-        <div class="hero-card">
-          <div class="hero-ttl">Receitas <span class="hero-hl">IA</span></div>
-          <div class="hero-sub">Personalizadas para o seu perfil</div>
+
+        <!-- HERO -->
+        <div style="background:linear-gradient(135deg,rgba(224,64,251,.15),rgba(30,8,48,.95));border:1px solid rgba(224,64,251,.25);border-radius:16px;padding:18px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pur),var(--mag))"></div>
+          <div style="font-size:22px;font-weight:800">Receitas <span style="background:linear-gradient(135deg,var(--pur),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">IA</span> 🍳</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:3px;font-family:'Share Tech Mono',monospace">Personalizadas para o seu perfil</div>
         </div>
-        <div class="card" style="padding:14px">
-          <div class="fl" style="margin-bottom:8px">Tipo de receita</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="recTags">
-            <div class="qb" onclick="setRecTag(this,'Pos-treino alta proteina')">Pos-treino</div>
-            <div class="qb" onclick="setRecTag(this,'Alta proteina low carb')">High Protein</div>
-            <div class="qb" onclick="setRecTag(this,'Cafe da manha energetico')">Cafe da manha</div>
-            <div class="qb" onclick="setRecTag(this,'Jantar leve digestivo')">Jantar leve</div>
-            <div class="qb" onclick="setRecTag(this,'Lanche rapido saudavel')">Lanche</div>
-            <div class="qb" onclick="setRecTag(this,'Almoco completo nutritivo')">Almoco</div>
+
+        <!-- TAGS RÁPIDAS -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-family:'Share Tech Mono',monospace">Tipo de receita</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="recTags">
+          <div class="qb" onclick="setRecTag(this,'Pos-treino alta proteina')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">Pos-treino</div>
+          <div class="qb" onclick="setRecTag(this,'Alta proteina low carb')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">High Protein</div>
+          <div class="qb" onclick="setRecTag(this,'Cafe da manha energetico')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">Cafe da manha</div>
+          <div class="qb" onclick="setRecTag(this,'Jantar leve digestivo')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">Jantar leve</div>
+          <div class="qb" onclick="setRecTag(this,'Lanche rapido saudavel')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">Lanche</div>
+          <div class="qb" onclick="setRecTag(this,'Almoco completo nutritivo')" style="cursor:pointer;padding:8px 14px;border-radius:20px;border:1px solid var(--bd);background:var(--glass);color:var(--dim);font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap">Almoco</div>
+        </div>
+
+        <!-- FORM GERAÇÃO -->
+        <div style="background:var(--glass);border:1px solid var(--bd);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Ingredientes ou objetivo</div>
+            <input class="fi" id="recGoal" placeholder="Ex: frango, batata-doce, ovo..." style="width:100%;box-sizing:border-box">
           </div>
-          <div class="fg" style="margin-bottom:10px"><div class="fl">Ingredientes ou objetivo</div><input class="fi" id="recGoal" placeholder="Ex: frango, batata-doce..."></div>
-          <div class="fg" style="margin-bottom:14px"><div class="fl">Restricoes (opcional)</div><input class="fi" id="recRestr" placeholder="Vegano, sem lactose..."></div>
-          <button class="btn-p" onclick="gerarReceita()">Gerar receita com IA</button>
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Restricoes (opcional)</div>
+            <input class="fi" id="recRestr" placeholder="Vegano, sem lactose, sem gluten..." style="width:100%;box-sizing:border-box">
+          </div>
+          <button class="btn-p" onclick="gerarReceita()" style="letter-spacing:2px">
+            Gerar receita com IA
+          </button>
         </div>
+
+        <!-- RESULTADO -->
         <div id="recResult"></div>
+
+        <!-- HISTÓRICO -->
         <div id="recHist"></div>
+
       </div>
+
 
       <!-- AI CHAT -->
       <div class="scr" id="scr-ai" style="padding:0;gap:0">
@@ -930,9 +952,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
             <div style="font-size:15px;font-weight:600">Notificacoes</div>
             <span style="color:var(--dim);font-size:16px">›</span>
           </div>
-          <div onclick="toast('Em breve','ok')" style="display:flex;align-items:center;justify-content:space-between;padding:17px 16px;cursor:pointer" ontouchstart="this.style.background='rgba(103,58,183,.08)'" ontouchend="this.style.background='transparent'">
+          <div onclick="toast('Em breve','ok')" style="display:flex;align-items:center;justify-content:space-between;padding:17px 16px;border-bottom:1px solid var(--bd);cursor:pointer" ontouchstart="this.style.background='rgba(103,58,183,.08)'" ontouchend="this.style.background='transparent'">
             <div style="font-size:15px;font-weight:600">Gestao de dispositivo</div>
             <span style="color:var(--dim);font-size:16px">›</span>
+          </div>
+          <div onclick="openConfigIA()" style="display:flex;align-items:center;justify-content:space-between;padding:17px 16px;cursor:pointer" ontouchstart="this.style.background='rgba(103,58,183,.08)'" ontouchend="this.style.background='transparent'">
+            <div style="font-size:15px;font-weight:600">Configurar IA (Worker URL)</div>
+            <span style="color:var(--pur);font-size:16px">›</span>
           </div>
         </div>
 
@@ -974,36 +1000,56 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
 
     <!-- BOTTOM NAV -->
-    <div style="flex-shrink:0;padding:8px 10px calc(10px + env(safe-area-inset-bottom));background:rgba(16,3,25,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);position:relative">
+    <div style="flex-shrink:0;padding:8px 8px calc(12px + env(safe-area-inset-bottom));background:rgba(16,3,25,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);position:relative">
       <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pur),var(--mag),var(--pur),transparent);opacity:.6"></div>
-      <div id="bnavPill" style="display:flex;align-items:center;justify-content:space-around;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:50px;padding:5px 4px;position:relative">
+      <div style="display:flex;align-items:flex-end;justify-content:space-around">
 
-        <div class="nv on" id="nv-home" onclick="goTab('home')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <svg id="nv-ico-home" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--pur)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <!-- HOME -->
+        <div class="nv on" id="nv-home" onclick="goTab('home')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-home" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--mag));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(103,58,183,.7);transition:all .25s">
+            <svg id="nv-ico-home" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
           <span id="nv-lbl-home" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--mag);font-family:'Share Tech Mono',monospace">Home</span>
         </div>
 
-        <div class="nv" id="nv-dieta" onclick="navPro('dieta')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <svg id="nv-ico-dieta" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
+        <!-- DIETA -->
+        <div class="nv" id="nv-dieta" onclick="navPro('dieta')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-dieta" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .25s">
+            <svg id="nv-ico-dieta" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
+          </div>
           <span id="nv-lbl-dieta" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace">Dieta</span>
         </div>
 
-        <!-- BOTÃO CENTRAL ELEVADO — estilo imagem 2 amarelo -->
-        <div onclick="navPro('ai')" style="flex:0 0 58px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;margin-top:-18px;-webkit-tap-highlight-color:transparent">
-          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--mag));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(103,58,183,.65);border:3px solid rgba(16,3,25,.95)">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/></svg>
+        <!-- BOTÃO CENTRAL IA -->
+        <div class="nv" id="nv-ai" onclick="navPro('ai')" style="flex:0 0 64px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-ai" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .25s">
+            <svg id="nv-ico-ai" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/></svg>
           </div>
-          <span style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--mag);font-family:'Share Tech Mono',monospace;margin-top:1px">IA</span>
+          <span id="nv-lbl-ai" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace">IA</span>
         </div>
 
-        <div class="nv" id="nv-treino" onclick="navPro('treino')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <svg id="nv-ico-treino" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M4 8h4M16 8h4M4 16h4M16 16h4"/></svg>
+        <!-- TREINO -->
+        <div class="nv" id="nv-treino" onclick="navPro('treino')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-treino" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .25s">
+            <svg id="nv-ico-treino" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M4 8h4M16 8h4M4 16h4M16 16h4"/></svg>
+          </div>
           <span id="nv-lbl-treino" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace">Treino</span>
         </div>
 
-        <div class="nv" id="nv-financas" onclick="goTab('financas')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <svg id="nv-ico-financas" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <!-- FINANCAS -->
+        <div class="nv" id="nv-financas" onclick="goTab('financas')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-financas" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .25s">
+            <svg id="nv-ico-financas" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
           <span id="nv-lbl-financas" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace">Financas</span>
+        </div>
+
+        <!-- RECEITAS -->
+        <div class="nv" id="nv-receitas" onclick="navPro('receitas')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div id="nv-circle-receitas" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;transition:all .25s">
+            <svg id="nv-ico-receitas" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M8 12h8M12 8v8"/></svg>
+          </div>
+          <span id="nv-lbl-receitas" style="font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace">Receitas</span>
         </div>
 
       </div>
@@ -1142,10 +1188,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div id="payPix">
       <div style="background:var(--glass);border:1px solid var(--bd);border-radius:14px;padding:18px;text-align:center;margin-bottom:12px">
         <div style="font-size:11px;color:var(--dim);margin-bottom:9px">Chave PIX para pagamento</div>
-        <div style="background:var(--bg);border:1px solid var(--bd2);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--txt);word-break:break-all;margin-bottom:10px">evoluai@pagamentos.com.br</div>
+        <div style="background:var(--bg);border:1px solid var(--bd2);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--txt);word-break:break-all;margin-bottom:10px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="87e2f1e8ebf2e6eec7f7e6e0e6eae2e9f3e8f4a9e4e8eaa9e5f5">[email&#160;protected]</a></div>
         <button onclick="copyPix()" style="background:transparent;border:2px solid var(--pur);color:var(--pur);border-radius:9px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;width:100%">Copiar chave PIX</button>
       </div>
-      <div style="font-size:11px;color:var(--dim);text-align:center;line-height:1.7;padding-bottom:8px">Apos pagar, envie o comprovante para<br><strong style="color:var(--txt)">suporte@evoluai.app</strong> — ativacao em ate 1h.</div>
+      <div style="font-size:11px;color:var(--dim);text-align:center;line-height:1.7;padding-bottom:8px">Apos pagar, envie o comprovante para<br><strong style="color:var(--txt)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2f292c332e28391c392a3330293d35723d2c2c">[email&#160;protected]</a></strong> — ativacao em ate 1h.</div>
     </div>
     <div id="payCard" style="display:none">
       <div style="display:flex;flex-direction:column;gap:11px">
@@ -1199,6 +1245,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <div class="toast" id="toastEl"></div>
 
 <script>
+
 // ═══════════════════════════════════════════
 // LOGO refs
 // ═══════════════════════════════════════════
@@ -1538,45 +1585,84 @@ function coletarOnboarding() {
 // API IA
 // ═══════════════════════════════════════════
 const AI_KEY = (()=>{
-  const p1='c2stYW50LWFwaTA';
-  const p2='zLWJweEJBSDdfVS1SZlY5UjNQV0FxUjhjaT';
-  const p3='M3bGQyR3o3ak5yMDJNa0pUSzd5Y19KOU51WV9HQ3VZVVlCaE9fSHdKclY3SG1t';
-  const p4='V2I5aUwtSU5lSUhWRnVBLXdGXzZvQUFB';
-  try{return atob(p1+p2+p3+p4);}catch(e){return '';}
+  const p1='Z3NrX1dubFBETERYQzBJ';
+  const p2='UFVUV2RZcEpsV0dkeWIz';
+  const p3='RllkSUlpTEVqelNvdWFZZTd5WlpQUEhCMFc=';
+  try{return atob(p1+p2+p3);}catch(e){return '';}
 })();
 
 async function callAI(prompt, maxTok=2000, imgData=null, imgMime=null) {
-  const headers = {
-    'Content-Type':'application/json',
-    'x-api-key': AI_KEY,
-    'anthropic-version':'2023-06-01',
-    'anthropic-dangerous-direct-browser-access':'true'
-  };
+  // ─────────────────────────────────────────────────
+  // WORKER_URL: URL do seu Cloudflare Worker
+  // Siga as instruções abaixo para configurar
+  const WORKER_URL = DB.get('worker_url') || 'https://broad-shape-e719evoluai.marc0s-ayale.workers.dev/';
+  // ─────────────────────────────────────────────────
 
-  let messages;
-  if (imgData && imgMime) {
-    messages = [{
-      role: 'user',
-      content: [
-        {type:'image', source:{type:'base64', media_type:imgMime, data:imgData}},
-        {type:'text', text:prompt}
-      ]
-    }];
-  } else {
-    messages = [{role:'user', content:prompt}];
+  const systemPrompt = 'Voce e um assistente pessoal de saude, fitness e financas. Responda sempre em portugues brasileiro. Seja direto e pratico.';
+
+  // Tenta via Worker (Cloudflare proxy — sem CORS)
+  if(WORKER_URL && !WORKER_URL.includes('SEU-USUARIO')){
+    try{
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          key: AI_KEY,
+          prompt: prompt,
+          max_tokens: maxTok,
+          system: systemPrompt
+        })
+      });
+      const data = await res.json();
+      if(res.ok && data.text) return data.text;
+      if(data.error){
+        if(data.error.includes('exceeded')||data.error.includes('limit'))
+          throw new Error('Limite Groq atingido. Aguarde alguns minutos.');
+        throw new Error(data.error);
+      }
+    }catch(e){
+      if(e.message.includes('Limite')) throw e;
+      console.warn('Worker falhou:', e.message);
+    }
   }
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers,
-    body: JSON.stringify({
-      model:'claude-sonnet-4-6',
-      max_tokens: maxTok,
-      messages
-    })
-  });
-  const data = await res.json();
-  if(!res.ok) throw new Error(data.error?.message||'API error '+res.status);
-  return data.content.map(x=>x.text||'').join('');
+  // Fallback: Anthropic (se tiver saldo)
+  try{
+    const ANTH = (()=>{
+      const p1='c2stYW50LWFwaTA',p2='zLWJweEJBSDdfVS1SZlY5UjNQV0FxUjhjaT';
+      const p3='M3bGQyR3o3ak5yMDJNa0pUSzd5Y19KOU51WV9HQ3VZVVlCaE9fSHdKclY3SG1t';
+      const p4='V2I5aUwtSU5lSUhWRnVBLXdGXzZvQUFB';
+      try{return atob(p1+p2+p3+p4);}catch(e){return '';}
+    })();
+    if(ANTH){
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key':ANTH,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body:JSON.stringify({
+          model:'claude-haiku-4-5-20251001',
+          max_tokens:maxTok,
+          messages:[{role:'user',content:prompt}]
+        })
+      });
+      if(res.ok){
+        const d = await res.json();
+        const t = d?.content?.map(x=>x.text||'').join('');
+        if(t) return t;
+      }
+    }
+  }catch(e2){ console.warn('Anthropic fallback falhou:', e2.message); }
+
+  // Se WORKER_URL não configurado ainda, mostrar instrução
+  if(WORKER_URL.includes('SEU-USUARIO')){
+    throw new Error('Configure o Worker: siga as instrucoes em Configuracoes > IA');
+  }
+
+  throw new Error('IA indisponivel. Verifique sua conexao.');
 }
 
 function parseJSON(txt) {
@@ -1589,14 +1675,27 @@ function parseJSON(txt) {
 async function rodarGeracao() {
   mostrar('pgGen');
   if(U.plan==='free'){await sleep(1200);iniciarApp();return;}
+  // Verificar o que já existe — NÃO sobrescrever dados do usuário
+  const jaTemDieta  = !!DB.get('d:'+U.email);
+  const jaTemTreino = !!DB.get('w:'+U.email);
+  const jaTemMetas  = !!DB.get('g:'+U.email);
   markGen(0,'Analisando perfil e objetivos...');
   await sleep(800); doneGen(0);
-  markGen(1,'Gerando plano alimentar semanal...');
-  const dieta=await gerarDieta(); DB.set('d:'+U.email,dieta); doneGen(1); await sleep(300);
-  markGen(2,'Criando plano de treinos...');
-  const treino=await gerarTreino(); DB.set('w:'+U.email,treino); doneGen(2); await sleep(300);
-  markGen(3,'Configurando metas iniciais...');
-  await sleep(500); DB.set('g:'+U.email,gerarMetasIniciais()); doneGen(3);
+  markGen(1, jaTemDieta ? 'Dieta existente mantida' : 'Gerando plano alimentar semanal...');
+  if(!jaTemDieta){
+    try{ const d=await gerarDieta(); DB.set('d:'+U.email,d); }
+    catch(e){ DB.set('d:'+U.email,fbDieta()); }
+  }
+  doneGen(1); await sleep(300);
+  markGen(2, jaTemTreino ? 'Treino existente mantido' : 'Criando plano de treinos...');
+  if(!jaTemTreino){
+    try{ const t=await gerarTreino(); DB.set('w:'+U.email,t); }
+    catch(e){ DB.set('w:'+U.email,fbTreino()); }
+  }
+  doneGen(2); await sleep(300);
+  markGen(3, jaTemMetas ? 'Metas existentes mantidas' : 'Configurando metas iniciais...');
+  if(!jaTemMetas){ DB.set('g:'+U.email,gerarMetasIniciais()); }
+  doneGen(3);
   await sleep(400); iniciarApp();
 }
 function markGen(i,txt){document.getElementById('genCur').textContent=txt;const el=document.getElementById('gi'+i);el.querySelector('.gi-txt').style.color='var(--pur)';el.querySelector('.gi-ck').textContent='...';}
@@ -1709,27 +1808,34 @@ async function gerarPlanosBackground() {
 function atualizarPerfil(){
   const nm=U.nome||'--';
   const ini=nm.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'E';
-  document.getElementById('avBtn').textContent=ini[0];
-  document.getElementById('profAvEl').textContent=ini;
-  document.getElementById('heroName').textContent=nm;
-  document.getElementById('profNomeEl').textContent=nm;
-  document.getElementById('profMetaEl').textContent=(U.email||'')+'  Evoluai';
-  document.getElementById('stPeso').textContent=U.peso||'--';
-  document.getElementById('stMeta').textContent=U.metaPeso||'--';
-  document.getElementById('stIdade').textContent=U.idade||'--';
-  document.getElementById('profGoal').textContent=U.objetivo||'--';
-  document.getElementById('profLvl').textContent=U.nivel||'--';
-  document.getElementById('profEmp').textContent=U.emprego||'--';
-  // novos IDs perfil redesenhado
-  const _ns=document.getElementById('profNomeShort'); if(_ns)_ns.textContent=nm;
-  const _es=document.getElementById('profEmailShort'); if(_es)_es.textContent=(U.email||'').replace(/(.{1}).+(@.+)/,'$1***$2').slice(0,22);
-  const _ps=document.getElementById('profPlanShort'); if(_ps){_ps.textContent=U.plan==='pro'?'PRO ✨':'FREE';_ps.style.color=U.plan==='pro'?'var(--mag)':'var(--dim)';}
-  const _ur=document.getElementById('upgRow'); if(_ur)_ur.style.display=U.plan==='pro'?'none':'block';
-  const _pt=document.getElementById('planTag'); if(_pt){_pt.textContent=U.plan==='pro'?'PRO':'FREE';_pt.className='plan-tag '+(U.plan==='pro'?'tag-pro':'tag-free');}
-  const tag=document.getElementById('planTag');
-  tag.textContent=U.plan==='pro'?'PRO':'FREE';
-  tag.className='plan-tag '+(U.plan==='pro'?'tag-pro':'tag-free');
-  document.getElementById('upgBtn').style.display=U.plan==='pro'?'none':'block';
+  // helper null-safe
+  function _set(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+  function _style(id,prop,val){ const el=document.getElementById(id); if(el) el.style[prop]=val; }
+  function _cls(id,cls){ const el=document.getElementById(id); if(el) el.className=cls; }
+  _set('avBtn', ini[0]);
+  _set('profAvEl', ini);
+  _set('heroName', nm);
+  _set('profNomeEl', nm);
+  _set('profMetaEl', (U.email||'')+'  ·  Evoluai');
+  _set('stPeso', U.peso||'--');
+  _set('stMeta', U.metaPeso||'--');
+  _set('stIdade', U.idade||'--');
+  _set('profGoal', U.objetivo||'--');
+  _set('profLvl', U.nivel||'--');
+  _set('profEmp', U.emprego||'--');
+  // IDs do profile redesenhado
+  _set('profNomeShort', nm);
+  const _es=document.getElementById('profEmailShort');
+  if(_es) _es.textContent=(U.email||'').replace(/(.{1}).+(@.+)/,'$1***$2').slice(0,22);
+  const _ps=document.getElementById('profPlanShort');
+  if(_ps){ _ps.textContent=U.plan==='pro'?'PRO ✨':'FREE'; _ps.style.color=U.plan==='pro'?'var(--mag)':'var(--dim)'; }
+  const _ur=document.getElementById('upgRow');
+  if(_ur) _ur.style.display=U.plan==='pro'?'none':'block';
+  // planTag (pode ter 2, atualiza ambos)
+  document.querySelectorAll('#planTag,[id="planTag"]').forEach(el=>{
+    el.textContent=U.plan==='pro'?'PRO':'FREE';
+    el.className='plan-tag '+(U.plan==='pro'?'tag-pro':'tag-free');
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1738,16 +1844,26 @@ function atualizarPerfil(){
 function goTab(t){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'));
-  const scr=document.getElementById('scr-'+t);
-  const nav=document.getElementById('nv-'+t);
+  var scr=document.getElementById('scr-'+t);
+  var nav=document.getElementById('nv-'+t);
   if(scr) scr.classList.add('on');
   if(nav) nav.classList.add('on');
-  ['home','dieta','treino','financas'].forEach(id=>{
-    const ico=document.getElementById('nv-ico-'+id);
-    const lbl=document.getElementById('nv-lbl-'+id);
-    const on=id===t;
-    if(ico) ico.setAttribute('stroke', on?'var(--pur)':'var(--muted)');
-    if(lbl){lbl.style.color=on?'var(--mag)':'var(--muted)';}
+  // círculo roxo: ativa no item selecionado, desativa nos outros
+  ['home','dieta','ai','treino','financas','receitas'].forEach(function(id){
+    var on=(id===t);
+    var circle=document.getElementById('nv-circle-'+id);
+    var ico=document.getElementById('nv-ico-'+id);
+    var lbl=document.getElementById('nv-lbl-'+id);
+    if(circle){
+      circle.style.background = on
+        ? 'linear-gradient(135deg,var(--pur),var(--mag))'
+        : 'rgba(255,255,255,.06)';
+      circle.style.boxShadow = on
+        ? '0 4px 16px rgba(103,58,183,.7)'
+        : 'none';
+    }
+    if(ico) ico.setAttribute('stroke', on ? 'white' : 'var(--muted)');
+    if(lbl) lbl.style.color = on ? 'var(--mag)' : 'var(--muted)';
   });
 }
 function navPro(t){if(U.plan!=='pro'&&t!=='metas'){openMov('mPay');return;}goTab(t);}
@@ -1933,33 +2049,37 @@ function qAdd(name,kcal,prot,carbo,gord,tipo){
 async function handlePhoto(input){
   if(!input.files.length) return;
   const drop=document.getElementById('photoDrop');
-  drop.innerHTML='<div style="width:44px;height:44px;border:3px solid var(--dead);border-top-color:var(--pur);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 10px"></div>'
-    +'<div style="font-size:13px;color:var(--dim)">Analisando com IA...</div>';
-  const file=input.files[0];
-  try {
-    const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
-    const mime=file.type||'image/jpeg';
+  // Groq nao suporta visao — pedir descricao por texto
+  drop.innerHTML='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Descreva o prato 🍽️</div>'
+    +'<input id="photoDesc" class="fi" placeholder="Ex: arroz, feijao, frango grelhado, salada..." style="margin-bottom:10px;width:100%">'
+    +'<button class="btn-p" style="padding:10px;font-size:12px" onclick="analisarDescricao()">Analisar com IA</button>';
+}
+
+async function analisarDescricao(){
+  const desc=(document.getElementById('photoDesc')?.value||'').trim();
+  if(!desc){toast('Descreva o prato primeiro','err');return;}
+  const drop=document.getElementById('photoDrop');
+  drop.innerHTML='<div style="width:36px;height:36px;border:3px solid var(--dead);border-top-color:var(--pur);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 8px"></div>'
+    +'<div style="font-size:12px;color:var(--dim)">Calculando macros...</div>';
+  try{
     const txt=await callAI(
-      'Voce e nutricionista. Analise esta foto de refeicao e retorne SOMENTE JSON: {"nome":"Nome do prato","kcal":500,"prot":35,"carbo":45,"gord":12}. Se nao for comida retorne {"erro":"Nao e uma refeicao"}',
-      500, b64, mime
+      'Nutricionista. Estime os macros de: "'+desc+'". Retorne SOMENTE JSON sem markdown: {"nome":"'+desc+'","kcal":500,"prot":35,"carbo":45,"gord":12}',
+      300
     );
     const f=parseJSON(txt);
-    if(f.erro){
-      drop.innerHTML='<div style="font-size:13px;color:var(--mag)">'+san(f.erro)+'</div>';
-      return;
-    }
-    drop.innerHTML='<div style="font-size:14px;font-weight:700;color:var(--pur)">Prato identificado</div>';
-    document.getElementById('pcName').textContent=san(f.nome);
-    document.getElementById('pcK').textContent=f.kcal;
-    document.getElementById('pcP').textContent=f.prot+'g';
-    document.getElementById('pcC').textContent=f.carbo+'g';
-    document.getElementById('pcF').textContent=f.gord+'g';
+    drop.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--pur)">Macros estimados ✓</div>';
+    document.getElementById('pcName').textContent=san(f.nome||desc);
+    document.getElementById('pcK').textContent=f.kcal||0;
+    document.getElementById('pcP').textContent=(f.prot||0)+'g';
+    document.getElementById('pcC').textContent=(f.carbo||0)+'g';
+    document.getElementById('pcF').textContent=(f.gord||0)+'g';
     document.getElementById('pcRes').style.display='block';
-    handlePhoto._data={n:f.nome,k:f.kcal,p:f.prot+'g',c:f.carbo+'g',f:f.gord+'g'};
-  } catch(e){
-    drop.innerHTML='<div class="photo-drop-ico"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>'
-      +'<div style="font-size:14px;font-weight:700">Fotografar refeicao</div>'
-      +'<div style="font-size:12px;color:var(--mag)">Erro na analise. Tente novamente.</div>';
+    handlePhoto._data={n:f.nome||desc,k:f.kcal,p:(f.prot||0)+'g',c:(f.carbo||0)+'g',f:(f.gord||0)+'g'};
+  }catch(e){
+    drop.innerHTML='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Descreva o prato 🍽️</div>'
+      +'<input id="photoDesc" class="fi" placeholder="Ex: arroz, feijao, frango..." style="margin-bottom:10px;width:100%">'
+      +'<button class="btn-p" style="padding:10px;font-size:12px" onclick="analisarDescricao()">Analisar com IA</button>'
+      +'<div style="font-size:11px;color:var(--mag);margin-top:8px">'+san(e.message)+'</div>';
   }
 }
 
@@ -2115,8 +2235,14 @@ function toggleGoal(id){
 // RECEITAS
 // ═══════════════════════════════════════════
 function setRecTag(el,tag){
-  document.querySelectorAll('#recTags .qb').forEach(b=>{b.style.borderColor='';b.style.color='';});
-  el.style.borderColor='var(--pur)'; el.style.color='var(--pur)';
+  document.querySelectorAll('#recTags .qb').forEach(b=>{
+    b.style.borderColor='var(--bd)';
+    b.style.color='var(--dim)';
+    b.style.background='var(--glass)';
+  });
+  el.style.borderColor='var(--pur)';
+  el.style.color='var(--pur)';
+  el.style.background='rgba(103,58,183,.12)';
   const inp=document.getElementById('recGoal'); if(inp) inp.value=tag;
 }
 
@@ -2142,7 +2268,12 @@ async function gerarReceita(){
     resEl.innerHTML=buildRecCard(r);
     renderRecHist();
   } catch(e){
-    resEl.innerHTML='<div class="empty"><div class="empty-t">Erro ao gerar receita</div><div class="empty-s">Verifique sua conexao e tente novamente</div></div>';
+    var msg=e.message||'Erro desconhecido';
+    if(msg.includes('exceeded_limit')||msg.includes('Limite semanal')){
+      msg='Limite semanal da IA atingido. Disponivel novamente em breve.';
+    }
+    resEl.innerHTML='<div class="empty" style="padding:24px;text-align:center"><div style="font-size:32px;margin-bottom:8px">'+(msg.includes('Limite')?'⏳':'⚠️')+'</div><div class="empty-t" style="color:var(--mag)">'+(msg.includes('Limite')?'Limite atingido':'Erro ao gerar receita')+'</div><div class="empty-s" style="margin-top:8px;line-height:1.6">'+msg+'</div></div>';
+    console.error('gerarReceita error:',e);
   } finally {
     if(btn){btn.textContent='Gerar receita com IA';btn.disabled=false;}
   }
@@ -2223,7 +2354,12 @@ async function sendChat(){
     appendMsg(txt,'a');
   } catch(e){
     removeTyping(tid);
-    appendMsg('Erro de conexao. Verifique sua internet e tente novamente.','a');
+    let emsg=e.message||'Erro desconhecido';
+    if(emsg.includes('exceeded_limit')||emsg.includes('Limite semanal')){
+      emsg='Limite semanal da IA atingido. Disponivel novamente em breve.';
+    }
+    appendMsg(emsg,'a');
+    console.error('sendChat error:',e);
   }
 }
 
@@ -2293,6 +2429,19 @@ function refazerQuestionario(){
 // ═══════════════════════════════════════════
 // NOTIFICACOES
 // ═══════════════════════════════════════════
+function openConfigIA(){
+  const atual = DB.get('worker_url')||'';
+  const url = prompt('Cole a URL do seu Cloudflare Worker:\n\n(Ex: https://evoluai-proxy.meuusuario.workers.dev)\n\nDeixe vazio para usar o modo padrao.', atual);
+  if(url === null) return; // cancelou
+  if(url.trim()){
+    DB.set('worker_url', url.trim());
+    toast('Worker URL salvo!', 'ok');
+  } else {
+    DB.del('worker_url');
+    toast('URL removida', 'ok');
+  }
+}
+
 function openNotifSettings(){
   const perm=typeof Notification!=='undefined'?Notification.permission:'denied';
   const blk=document.getElementById('notifPermBlock');
@@ -2469,6 +2618,7 @@ window.addEventListener('appinstalled',()=>{toast('Evoluai instalado!','ok');doc
 function doInstall(){document.getElementById('installBanner')?.remove();if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')toast('Evoluai instalado!','ok');deferredPrompt=null;});}}
 
 window.addEventListener('load',()=>{initPWA();});
+
 </script>
 </body>
 </html>

@@ -2618,15 +2618,11 @@ function initPWA(){
   const manifestStr=JSON.stringify(manifest);
   const manifestB64='data:application/manifest+json;base64,'+btoa(unescape(encodeURIComponent(manifestStr)));
   const lnk=document.getElementById('pwaManifest');if(lnk)lnk.href=manifestB64;
-  // Registrar sw.js — funciona no GitHub Pages após upload do sw.js
+  // Registrar sw.js — funciona no GitHub Pages
   if('serviceWorker' in navigator){
-    const isGHPages = location.hostname.includes('github.io') || location.hostname.includes('workers.dev');
-    const swUrl = isGHPages ? './sw.js' : null;
-    if(swUrl){
-      navigator.serviceWorker.register(swUrl)
-        .then(r=>{ window._swReg=r; })
-        .catch(()=>{});
-    }
+    navigator.serviceWorker.register('./sw.js', {scope: './'})
+      .then(r=>{ window._swReg=r; })
+      .catch(()=>{}); // silencia erro em outros ambientes
   }
   // iOS tip
   if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone&&!sessionStorage.getItem('iosTip')){

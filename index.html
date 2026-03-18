@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#100319">
 <link rel="manifest" id="pwaManifest">
 <link rel="apple-touch-icon" id="appleIcon">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap">
@@ -2599,11 +2600,13 @@ function initPWA(){
     start_url:'./',
     scope:'./',
     display:'standalone',
+    display_override:['standalone','minimal-ui'],
     background_color:'#100319',
     theme_color:'#673AB7',
     orientation:'portrait-primary',
     lang:'pt-BR',
     categories:['health','fitness','finance'],
+    prefer_related_applications: false,
     icons:[
       {src:icon,sizes:'192x192',type:'image/png',purpose:'any'},
       {src:icon,sizes:'192x192',type:'image/png',purpose:'maskable'},
@@ -2615,9 +2618,15 @@ function initPWA(){
   const manifestStr=JSON.stringify(manifest);
   const manifestB64='data:application/manifest+json;base64,'+btoa(unescape(encodeURIComponent(manifestStr)));
   const lnk=document.getElementById('pwaManifest');if(lnk)lnk.href=manifestB64;
+  // Registrar sw.js — funciona no GitHub Pages após upload do sw.js
   if('serviceWorker' in navigator){
-    const sw='const C="evo-v5";self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener("fetch",e=>{if(e.request.url.includes("api.anthropic")||e.request.url.includes("firebase")||e.request.url.includes("googleapis"))return;e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok)c.put(e.request,res.clone());return res;}).catch(()=>r))));});self.addEventListener("message",e=>{if(e.data&&e.data.type==="SCHEDULE_NOTIF"){setTimeout(()=>{self.registration.showNotification(e.data.title,{body:e.data.body,tag:e.data.tag||"evo",vibrate:[200,100,200]});},e.data.delayMs||500);}});';
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).then(r=>{window._swReg=r;}).catch(()=>{});
+    const isGHPages = location.hostname.includes('github.io') || location.hostname.includes('workers.dev');
+    const swUrl = isGHPages ? './sw.js' : null;
+    if(swUrl){
+      navigator.serviceWorker.register(swUrl)
+        .then(r=>{ window._swReg=r; })
+        .catch(()=>{});
+    }
   }
   // iOS tip
   if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone&&!sessionStorage.getItem('iosTip')){

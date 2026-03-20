@@ -2625,7 +2625,13 @@ async function pedirPermissao(){
 
 function saveNotif(){
   const cfg={agua:document.getElementById('nt_agua').checked,agua_int:document.getElementById('nt_agua_int').value,treino:document.getElementById('nt_treino').checked,treino_hr:document.getElementById('nt_treino_hr').value,refeicao:document.getElementById('nt_refeicao').checked,peso:document.getElementById('nt_peso').checked,peso_hr:document.getElementById('nt_peso_hr').value};
-  DB.set('notif:'+U.email,cfg); iniciarNotificacoes();
+  DB.set('notif:'+U.email,cfg);
+  // Cancelar agendamentos antigos no SW
+  navigator.serviceWorker.ready.then(reg=>{
+    if(reg&&reg.active) reg.active.postMessage({type:'CLEAR_NOTIFS'});
+  }).catch(()=>{});
+  iniciarNotificacoes();
+  toast('Notificacoes salvas!','ok');
 }
 
 function enviarNotif(titulo,corpo){
@@ -2650,26 +2656,35 @@ function enviarNotif(titulo,corpo){
 }
 
 function iniciarNotificacoes(){
-  _notifTimers.forEach(t=>clearInterval(t)); _notifTimers=[];
   if(typeof Notification==='undefined'||Notification.permission!=='granted') return;
   const cfg=DB.get('notif:'+U.email)||{};
-  if(cfg.agua){
-    const ms=(parseInt(cfg.agua_int)||2)*60*60*1000;
-    const msgs=['Beba um copo de agua agora!','Hora de se hidratar!','Voce bebeu agua recentemente?'];
-    _notifTimers.push(setInterval(()=>enviarNotif('Evoluai - Hidratacao',msgs[Math.floor(Math.random()*msgs.length)]),ms));
-  }
-  const t=setInterval(()=>{
-    const now=new Date();
-    const hhmm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-    if(cfg.treino&&cfg.treino_hr===hhmm) enviarNotif('Hora do Treino','Bora treinar hoje!');
-    if(cfg.refeicao){
-      if(hhmm==='08:00') enviarNotif('Cafe da manha','Registrou seu cafe da manha?');
-      if(hhmm==='12:30') enviarNotif('Almoco','Nao se esqueca de registrar o almoco!');
-      if(hhmm==='19:00') enviarNotif('Jantar','Registre seu jantar para manter o controle!');
+  // Usar SW para notificações em background
+  navigator.serviceWorker.ready.then(reg=>{
+    if(reg&&reg.active){
+      reg.active.postMessage({type:'SCHEDULE_NOTIFS', cfg:cfg});
+      console.log('[Notif] Agendadas via SW:', cfg);
     }
-    if(cfg.peso&&cfg.peso_hr===hhmm) enviarNotif('Registre seu peso','Pesou hoje? Sua meta e '+U.metaPeso+'kg.');
-  },60000);
-  _notifTimers.push(t);
+  }).catch(()=>{
+    // Fallback: setInterval (só funciona com app aberto)
+    _notifTimers.forEach(t=>clearInterval(t)); _notifTimers=[];
+    if(cfg.agua){
+      const ms=(parseInt(cfg.agua_int)||2)*60*60*1000;
+      const msgs=['Beba um copo de agua agora! 💧','Hora de se hidratar! 💧','Voce bebeu agua recentemente? 💧'];
+      _notifTimers.push(setInterval(()=>enviarNotif('Evoluai — Hidratacao',msgs[Math.floor(Math.random()*msgs.length)]),ms));
+    }
+    const t=setInterval(()=>{
+      const now=new Date();
+      const hhmm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+      if(cfg.treino&&cfg.treino_hr===hhmm) enviarNotif('Hora do Treino 💪','Bora treinar hoje!');
+      if(cfg.refeicao){
+        if(hhmm==='08:00') enviarNotif('Cafe da manha ☀️','Registrou seu cafe da manha?');
+        if(hhmm==='12:30') enviarNotif('Almoco 🍽️','Hora do almoco!');
+        if(hhmm==='19:00') enviarNotif('Jantar 🌙','Registre seu jantar!');
+      }
+      if(cfg.peso&&cfg.peso_hr===hhmm) enviarNotif('Registre seu peso 📊','Pesou hoje?');
+    },60000);
+    _notifTimers.push(t);
+  });
 }
 
 function pedirPermissaoAuto(){
@@ -2687,8 +2702,18 @@ function aceitarNotif(){document.querySelector('[style*="position:fixed;top:0"]'
 
 function testNotif(){
   if(typeof Notification==='undefined'||Notification.permission!=='granted'){pedirPermissao();return;}
-  enviarNotif('Evoluai','Notificacoes funcionando!');
-  toast('Notificacao enviada','ok');
+  navigator.serviceWorker.ready.then(reg=>{
+    if(reg&&reg.active){
+      reg.active.postMessage({type:'SHOW_NOTIF',title:'Evoluai ✅',body:'Notificacoes funcionando em background!'});
+      toast('Notificacao enviada via SW','ok');
+    } else {
+      enviarNotif('Evoluai','Notificacoes funcionando!');
+      toast('Notificacao enviada','ok');
+    }
+  }).catch(()=>{
+    enviarNotif('Evoluai','Notificacoes funcionando!');
+    toast('Notificacao enviada','ok');
+  });
 }
 
 // ═══════════════════════════════════════════

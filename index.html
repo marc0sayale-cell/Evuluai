@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Evoluai">
 <meta name="theme-color" content="#100319">
-<link rel="manifest" id="pwaManifest">
+<link rel="manifest" href="./manifest.json" id="pwaManifest">
 <link rel="apple-touch-icon" id="appleIcon">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2804,9 +2804,8 @@ function initPWA(){
     ]
   };
   // Usar data URI — funciona para PWA install no Chrome/Android
-  const manifestStr=JSON.stringify(manifest);
-  const manifestB64='data:application/manifest+json;base64,'+btoa(unescape(encodeURIComponent(manifestStr)));
-  const lnk=document.getElementById('pwaManifest');if(lnk)lnk.href=manifestB64;
+  // Manifest externo (manifest.json) — não sobrescrever com data URI
+  // O link já está no <head> apontando para manifest.json
   // Registrar sw.js — funciona no GitHub Pages
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js', {scope: './'})

@@ -22,13 +22,13 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512-1.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512-1.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -48,7 +48,7 @@
   ],
   "screenshots": [
     {
-      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512-1.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",

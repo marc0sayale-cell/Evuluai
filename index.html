@@ -551,7 +551,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="ob-num">05 — Treino</div>
       <div class="ob-ttl">Onde e quanto voce <em>treina?</em></div>
       <div class="ob-sub">A IA adapta todos os exercicios ao seu ambiente.</div>
-      <div class="fl" style="margin-bottom:8px">Local de treino</div>
+      <div class="fl" style="margin-bottom:8px">Tipo de treino preferido</div>
+      <div class="opts" id="tipoTreinoOpts">
+        <div class="opt" onclick="sel(this,'tipoTreinoOpts')"><div class="opt-ico">💪</div><div class="opt-bd"><div class="opt-n">Musculacao</div><div class="opt-d">Foco em hipertrofia e forca</div></div><div class="opt-ck"></div></div>
+        <div class="opt" onclick="sel(this,'tipoTreinoOpts')"><div class="opt-ico">🏋️</div><div class="opt-bd"><div class="opt-n">Corpo inteiro</div><div class="opt-d">Full body, todos os musculos por sessao</div></div><div class="opt-ck"></div></div>
+        <div class="opt" onclick="sel(this,'tipoTreinoOpts')"><div class="opt-ico">🔥</div><div class="opt-bd"><div class="opt-n">Definicao / Cardio</div><div class="opt-d">Queima de gordura e condicionamento</div></div><div class="opt-ck"></div></div>
+        <div class="opt" onclick="sel(this,'tipoTreinoOpts')"><div class="opt-ico">🤸</div><div class="opt-bd"><div class="opt-n">Funcional / Calistenia</div><div class="opt-d">Peso corporal e movimentos funcionais</div></div><div class="opt-ck"></div></div>
+        <div class="opt" onclick="sel(this,'tipoTreinoOpts')"><div class="opt-ico">🧘</div><div class="opt-bd"><div class="opt-n">Flexibilidade / Bem-estar</div><div class="opt-d">Yoga, pilates, mobilidade</div></div><div class="opt-ck"></div></div>
+      </div>
+      <div class="fl" style="margin-bottom:8px;margin-top:16px">Local de treino</div>
       <div class="opts" id="localOpts">
         <div class="opt" onclick="sel(this,'localOpts');toggleEqp(false)"><div class="opt-ico">&#127947;&#65039;</div><div class="opt-bd"><div class="opt-n">Academia</div><div class="opt-d">Maquinas, halteres e cabos</div></div><div class="opt-ck"></div></div>
         <div class="opt" onclick="sel(this,'localOpts');toggleEqp(true)"><div class="opt-ico">&#127968;</div><div class="opt-bd"><div class="opt-n">Em casa</div><div class="opt-d">Selecione seus equipamentos abaixo</div></div><div class="opt-ck"></div></div>
@@ -590,6 +598,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       </div>
       <div class="fg"><div class="fl">Alimentos que nao gosta (opcional)</div>
         <input class="fi" id="ob_ngosta" type="text" placeholder="Ex: berinjela, figado...">
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <div class="fl">Ingredientes que voce tem em casa (opcional)</div>
+        <input class="fi" id="ob_ingredientes" type="text" placeholder="Ex: frango, ovos, arroz, batata-doce...">
+        <div style="font-size:11px;color:var(--dim);margin-top:4px;font-family:'Share Tech Mono',monospace">A IA vai priorizar esses na dieta e receitas</div>
       </div>
     </div>
     <!-- STEP 7 -->
@@ -1543,7 +1556,7 @@ function obNext() {
   if(obStep===1){const n=(document.getElementById('ob_nome').value||'').trim();const sx=document.getElementById('ob_sexo').value;const alt=document.getElementById('ob_alt').value;if(!n){toast('Digite seu nome','err');return;}if(!sx){toast('Selecione seu sexo','err');return;}if(!alt||+alt<100||+alt>250){toast('Digite sua altura em cm','err');return;}}
   if(obStep===3&&!document.querySelector('#gOpts .opt.sel')){toast('Selecione seu objetivo','err');return;}
   if(obStep===4&&!document.querySelector('#lvlOpts .opt.sel')){toast('Selecione seu nivel','err');return;}
-  if(obStep===5){if(!document.querySelector('#localOpts .opt.sel')){toast('Selecione onde voce treina','err');return;}if(!document.querySelector('#frOpts .opt.sel')){toast('Selecione quantos dias','err');return;}}
+  if(obStep===5){if(!document.querySelector('#tipoTreinoOpts .opt.sel')){toast('Selecione o tipo de treino','err');return;}if(!document.querySelector('#localOpts .opt.sel')){toast('Selecione onde voce treina','err');return;}if(!document.querySelector('#frOpts .opt.sel')){toast('Selecione quantos dias','err');return;}}
   if(obStep===6&&!document.querySelector('#dietOpts .opt.sel')){toast('Selecione sua dieta','err');return;}
   if(obStep===7&&!document.querySelector('#empOpts .opt.sel')){toast('Selecione sua situacao','err');return;}
   if(obStep<7){obStep++;renderStep();}
@@ -1580,6 +1593,9 @@ function coletarOnboarding() {
   U.equipamentos=eqpSel.length>0?Array.from(eqpSel).map(e=>e.querySelector('.opt-n').textContent).join(', '):'nenhum';
   const dEl=document.querySelector('#dietOpts .opt.sel');U.dieta=dEl?dEl.querySelector('.opt-n').textContent:'Sem restricoes';
   U.ngosta=(document.getElementById('ob_ngosta').value||'').trim()||'nada';
+  const tipoTrEl=document.querySelector('#tipoTreinoOpts .opt.sel');
+  U.tipoTreino=tipoTrEl?tipoTrEl.querySelector('.opt-n').textContent:'Musculacao';
+  U.ingredientes=(document.getElementById('ob_ingredientes')?.value||'').trim()||'';
   const emEl=document.querySelector('#empOpts .opt.sel');U.emprego=emEl?emEl.querySelector('.opt-n').textContent:'Nao informado';
   U.renda=document.getElementById('ob_renda').value;
   U.onboarded=true;
@@ -1710,7 +1726,7 @@ async function gerarDieta() {
   const d=Object.assign({},DB.get('u:'+U.email)||{},U);
   try {
     const txt=await callAI(
-      'Nutricionista. Crie plano alimentar 7 dias para: Peso '+d.peso+'kg meta '+d.metaPeso+'kg, altura '+d.altura+'cm, idade '+d.idade+'a, sexo '+d.sexo+', objetivo: '+d.objetivo+', treino: '+d.freq+', local: '+d.local+', dieta: '+d.dieta+', nao gosta: '+(d.ngosta||'nada')+
+      'Nutricionista. Crie plano alimentar 7 dias para: Peso '+d.peso+'kg meta '+d.metaPeso+'kg, altura '+d.altura+'cm, idade '+d.idade+'a, sexo '+d.sexo+', objetivo: '+d.objetivo+', treino: '+d.freq+', local: '+d.local+', dieta: '+d.dieta+', nao gosta: '+(d.ngosta||'nada')+(d.ingredientes?', ingredientes disponiveis em casa: '+d.ingredientes+' (priorize esses ingredientes no plano e nas receitas)':'')+
       '. Retorne SOMENTE JSON: {"meta_kcal":2200,"meta_prot":160,"meta_carbo":220,"meta_gord":65,"dias":[{"dia":"Segunda","ref":[{"tipo":"Cafe da manha","nome":"Ovos mexidos","kcal":380,"prot":28,"carbo":30,"gord":14},{"tipo":"Almoco","nome":"Frango com arroz","kcal":580,"prot":50,"carbo":60,"gord":12},{"tipo":"Jantar","nome":"Atum com batata","kcal":480,"prot":42,"carbo":50,"gord":10},{"tipo":"Lanche","nome":"Iogurte grego","kcal":220,"prot":18,"carbo":22,"gord":5}]},{"dia":"Terca","ref":[...]},{"dia":"Quarta","ref":[...]},{"dia":"Quinta","ref":[...]},{"dia":"Sexta","ref":[...]},{"dia":"Sabado","ref":[...]},{"dia":"Domingo","ref":[...]}]}',
       3000
     );
@@ -1730,8 +1746,8 @@ async function gerarTreino() {
     :'Academia completa com maquinas e pesos';
   try {
     const txt=await callAI(
-      'Personal trainer. Crie plano de treino semanal PERSONALIZADO. Dados: objetivo='+d.objetivo+', nivel='+d.nivel+', local='+localDica+', frequencia='+d.freq+' ('+diasNum+' dias de treino), peso='+d.peso+'kg, idade='+d.idade+'a, sexo='+d.sexo+
-      '. OBRIGATORIO: exatamente '+diasNum+' dias de treino e '+(7-diasNum)+' de descanso. Adapte exercicios ao local indicado.'+
+      'Personal trainer. Crie plano de treino semanal PERSONALIZADO. Dados: objetivo='+d.objetivo+', tipo_treino='+(d.tipoTreino||'Musculacao')+', nivel='+d.nivel+', local='+localDica+', frequencia='+d.freq+' ('+diasNum+' dias de treino), peso='+d.peso+'kg, idade='+d.idade+'a, sexo='+d.sexo+
+      '. OBRIGATORIO: exatamente '+diasNum+' dias de treino e '+(7-diasNum)+' de descanso. Adapte exercicios ao local E ao tipo de treino preferido. Se for corpo inteiro, cada dia deve trabalhar o corpo todo.'+
       ' Retorne SOMENTE JSON: {"dias":[{"dia":"Segunda","tipo":"treino","nome":"Peito e Triceps","duracao":60,"exer":[{"nome":"Supino Reto","series":4,"reps":"10-12","descanso":"60s"}]},{"dia":"Terca","tipo":"treino","nome":"Costas","duracao":60,"exer":[...]},{"dia":"Quarta","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Quinta","tipo":"treino","nome":"Pernas","duracao":70,"exer":[...]},{"dia":"Sexta","tipo":"treino","nome":"Ombro","duracao":55,"exer":[...]},{"dia":"Sabado","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Domingo","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]}]}',
       2500
     );
@@ -2262,7 +2278,7 @@ async function gerarReceita(){
   try {
     const dieta=U.dieta||'Sem restricoes';
     const txt=await callAI(
-      'Nutricionista. Crie receita: "'+goal+'" para perfil: '+dieta+(restr?', '+restr:'')+'. '
+      'Nutricionista. Crie receita: "'+goal+'" para perfil: '+dieta+(restr?', '+restr:'')+(U.ingredientes?'. Ingredientes disponiveis: '+U.ingredientes+' (priorize esses)':'')+'. '
       +'Retorne SOMENTE JSON: {"nome":"...","tempo":"20 min","porcoes":2,"calorias":500,"tags":["Alta proteina"],"macros":{"proteina":"40g","carboidrato":"50g","gordura":"12g"},"ingredientes":[{"item":"Frango","qtd":"300g"}],"passos":["Passo 1..."]}',
       2000
     );

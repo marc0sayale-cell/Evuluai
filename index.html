@@ -450,13 +450,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="pc-name">PRO</div>
       <div class="pc-price">por apenas <strong>R$19,90/mes</strong></div>
       <div class="pc-feats">
-        <div class="pc-feat"><span class="feat-ok">+</span> Dieta semanal por IA</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> Plano de treinos IA</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> Controle financeiro</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> Assistente IA ilimitado</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> FotoCal analise de fotos</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> Receitas personalizadas</div>
-        <div class="pc-feat"><span class="feat-ok">+</span> Metas e acompanhamento</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Dieta semanal 100% personalizada por IA</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Plano de treino personalizado por IA</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Chat com assistente IA ilimitado</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Receitas IA baseadas no seu perfil</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> FotoCal ilimitado</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Metas ilimitadas + acompanhamento</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Planos se atualizam ao editar perfil</div>
       </div>
       <button class="btn-p" style="margin-top:18px" onclick="choosePlan('pro')">Comecar com PRO</button>
     </div>
@@ -464,10 +464,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="pc-name">FREE</div>
       <div class="pc-price"><strong>Gratis</strong> para sempre</div>
       <div class="pc-feats">
+        <div class="pc-feat"><span class="feat-ok">+</span> Dieta padrao com registro diario</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Treino padrao com historico</div>
         <div class="pc-feat"><span class="feat-ok">+</span> Controle financeiro completo</div>
-        <div class="pc-feat"><span class="feat-no">-</span><span class="feat-no-txt"> Dieta e FotoCal</span></div>
-        <div class="pc-feat"><span class="feat-no">-</span><span class="feat-no-txt"> Plano de treinos IA</span></div>
-        <div class="pc-feat"><span class="feat-no">-</span><span class="feat-no-txt"> Assistente e Receitas</span></div>
+        <div class="pc-feat"><span class="feat-ok">+</span> Metas (ate 3 ativas)</div>
+        <div class="pc-feat"><span class="feat-ok">+</span> FotoCal (ate 3x por dia)</div>
+        <div class="pc-feat"><span class="feat-no">-</span><span class="feat-no-txt"> Planos personalizados por IA</span></div>
+        <div class="pc-feat"><span class="feat-no">-</span><span class="feat-no-txt"> Chat IA e Receitas ilimitadas</span></div>
       </div>
       <button class="btn-o" style="margin-top:18px" onclick="choosePlan('free')">Continuar com Free</button>
     </div>
@@ -1262,12 +1265,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 <div class="toast" id="toastEl"></div>
 
-<script>
-
-// ═══════════════════════════════════════════
-// LOGO refs
-// ═══════════════════════════════════════════
-const LOGO = {
+<script>const LOGO = {
   get src() { const el = document.getElementById('_logoImg'); return el ? el.src : ''; }
 };
 window.addEventListener('DOMContentLoaded', () => {
@@ -1887,7 +1885,12 @@ function goTab(t){
     if(lbl) lbl.style.color = on ? 'var(--mag)' : 'var(--muted)';
   });
 }
-function navPro(t){if(U.plan!=='pro'&&t!=='metas'){openMov('mPay');return;}goTab(t);}
+function navPro(t){
+  // Dieta e treino: free tem versao basica, so bloqueia chat IA e receitas
+  const soPro=['ai','receitas'];
+  if(U.plan!=='pro'&&soPro.includes(t)){openMov('mPay');return;}
+  goTab(t);
+}
 
 // ═══════════════════════════════════════════
 // HOME
@@ -1964,7 +1967,44 @@ function renderHome(){
 function renderDieta(){
   const el=document.getElementById('dietaContent');
   if(U.plan!=='pro'){
-    el.innerHTML=lockHTML('Plano Alimentar IA','Exclusivo PRO. A IA cria um plano completo de 7 dias baseado no seu perfil.');
+    // Free: dieta padrão sem IA
+    const planFree=DB.get('d:'+U.email)||fbDieta();
+    if(!DB.get('d:'+U.email)) DB.set('d:'+U.email,planFree);
+    const meals=DB.get('m:'+U.email)||[];
+    const tod=hoje();
+    const todM=meals.filter(m=>m.date===tod);
+    const totK=todM.reduce((s,m)=>s+(+m.kcal||0),0);
+    const metaK=planFree.meta_kcal||2200;
+    const pct=Math.min(100,Math.round((totK/metaK)*100));
+    const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
+    const pd=planFree.dias.find(d=>dow.toLowerCase().slice(0,3)===d.dia.toLowerCase().slice(0,3));
+    let html='<div style="background:rgba(103,58,183,.08);border:1px solid rgba(103,58,183,.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
+      +'<div style="font-size:20px">⭐</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--mag)">PRO personaliza sua dieta com IA</div>'
+      +'<div style="font-size:11px;color:var(--dim);margin-top:2px">Plano padrao ativo. Upgrade para dieta personalizada.</div></div>'
+      +'<button onclick="openMov(\'mPay\')" style="background:linear-gradient(135deg,var(--pur),var(--mag));color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">PRO</button></div>';
+    html+='<div class="card"><div class="card-lbl">Calorias hoje</div>'
+      +'<div class="card-big" style="color:var(--pur)">'+totK+'<span style="font-size:16px;color:var(--dim)"> kcal</span></div>'
+      +'<div class="pbar-w"><div class="pbar"><div class="pfill pfill-pur" style="width:'+pct+'%"></div></div></div></div>';
+    if(pd){
+      html+='<div class="sec-t">Sugestao de hoje</div>';
+      pd.ref.forEach(function(r){
+        const done=todM.some(function(m){return m.name===r.nome;});
+        html+='<div class="meal-item"><div><div class="meal-nome">'+san(r.nome)+'</div>'
+          +'<div class="meal-meta">'+r.tipo+' / '+r.kcal+'kcal</div></div>';
+        if(done){
+          html+='<span class="tag tag-ok">Feito</span>';
+        } else {
+          html+='<button onclick="qAdd(this.dataset.n,+this.dataset.k,+this.dataset.p,+this.dataset.c,+this.dataset.f,this.dataset.t)"'
+            +' data-n="'+san(r.nome)+'" data-k="'+r.kcal+'" data-p="'+r.prot+'" data-c="'+r.carbo+'" data-f="'+r.gord+'" data-t="'+r.tipo+'"'
+            +' style="font-size:10px;color:var(--pur);background:none;border:none;cursor:pointer;font-family:\'Rajdhani\',sans-serif;font-weight:700">Adicionar</button>';
+        }
+        html+='</div>';
+      });
+    }
+    html+='<div class="sec-t">Adicionar refeicao</div>'
+      +'<div class="aform"><div class="fg"><input class="fi" id="mealName" placeholder="Ex: Frango com arroz"></div>'
+      +'<button class="btn-p" onclick="addMeal()">Adicionar</button></div>';
+    el.innerHTML=html;
     return;
   }
   const plan=DB.get('d:'+U.email);
@@ -2069,6 +2109,11 @@ function qAdd(name,kcal,prot,carbo,gord,tipo){
 // ═══════════════════════════════════════════
 async function handlePhoto(input){
   if(!input.files.length) return;
+  // Free: verificar limite antes de processar
+  if(U.plan!=='pro'){
+    const usosHoje=(DB.get('fotocal_usos:'+hoje())||0);
+    if(usosHoje>=3){toast('Limite diario atingido (3x). Upgrade para PRO para ilimitado.','err');return;}
+  }
   const drop=document.getElementById('photoDrop');
   // Groq nao suporta visao — pedir descricao por texto
   drop.innerHTML='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Descreva o prato 🍽️</div>'
@@ -2079,6 +2124,12 @@ async function handlePhoto(input){
 async function analisarDescricao(){
   const desc=(document.getElementById('photoDesc')?.value||'').trim();
   if(!desc){toast('Descreva o prato primeiro','err');return;}
+  // Free: limite 3x por dia
+  if(U.plan!=='pro'){
+    const usosHoje=(DB.get('fotocal_usos:'+hoje())||0);
+    if(usosHoje>=3){toast('Limite diario atingido (3x). Upgrade para PRO para ilimitado.','err');return;}
+    DB.set('fotocal_usos:'+hoje(), usosHoje+1);
+  }
   const drop=document.getElementById('photoDrop');
   drop.innerHTML='<div style="width:36px;height:36px;border:3px solid var(--dead);border-top-color:var(--pur);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 8px"></div>'
     +'<div style="font-size:12px;color:var(--dim)">Calculando macros...</div>';
@@ -2115,7 +2166,31 @@ function addFromPhoto(){
 // ═══════════════════════════════════════════
 function renderTreino(){
   const el=document.getElementById('treinoContent');
-  if(U.plan!=='pro'){el.innerHTML=lockHTML('Plano de Treino IA','Disponivel no PRO. A IA cria um plano semanal adaptado ao seu nivel e local de treino.');return;}
+  if(U.plan!=='pro'){
+    // Free: treino padrão sem IA
+    const planFree=DB.get('w:'+U.email)||fbTreino();
+    if(!DB.get('w:'+U.email)) DB.set('w:'+U.email,planFree);
+    const wks=DB.get('k:'+U.email)||[];
+    const tod=hoje();
+    const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
+    let html='<div style="background:rgba(103,58,183,.08);border:1px solid rgba(103,58,183,.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
+      +'<div style="font-size:20px">⭐</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--mag)">PRO personaliza seu treino com IA</div>'
+      +'<div style="font-size:11px;color:var(--dim);margin-top:2px">Plano padrao ativo. Upgrade para treino personalizado.</div></div>'
+      +'<button onclick="openMov(\'mPay\')" style="background:linear-gradient(135deg,var(--pur),var(--mag));color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">PRO</button></div>';
+    html+='<div class="sec-t">Plano da semana</div>';
+    planFree.dias.forEach(function(d){
+      const done=wks.some(function(w){return w.date===tod&&w.grupo===d.nome;});
+      const isHoje=dow.toLowerCase().slice(0,3)===d.dia.toLowerCase().slice(0,3);
+      const isRest=d.tipo==='descanso';
+      html+='<div class="wd-item" '+(isRest?'style="cursor:default"':'onclick="showWD(\''+d.dia+'\')"')+'>'
+        +'<div class="wd-n '+(isHoje?'wdn-a':done?'wdn-d':'wdn-r')+'">'+d.nome[0]+'</div>'
+        +'<div class="wd-info"><div class="wd-nome">'+san(d.nome)+'</div>'
+        +'<div class="wd-meta">'+d.dia+(isRest?'':' / '+d.duracao+' min')+'</div></div>'
+        +'<span class="tag '+(isHoje?'tag-pur':done?'tag-ok':'tag-pur')+'">'+(isHoje?'Hoje':done?'Feito':isRest?'Descanso':'')+'</span></div>';
+    });
+    el.innerHTML=html;
+    return;
+  }
   const plan=DB.get('w:'+U.email);
   const wks=DB.get('k:'+U.email)||[];
   const tod=hoje();
@@ -2223,11 +2298,8 @@ function addTx(){
 // METAS
 // ═══════════════════════════════════════════
 function renderMetas(){
-  if(U.plan!=='pro'){
-    document.getElementById('goalsList').innerHTML=lockHTML('Metas Avancadas','Disponivel no PRO.');
-    document.getElementById('metasTags').innerHTML='<span class="tag tag-mag">PRO</span>';
-    return;
-  }
+  // Free: até 3 metas
+  const isFree = U.plan!=='pro';
   const goals=DB.get('g:'+U.email)||[];
   const active=goals.filter(g=>!g.done).length;
   document.getElementById('metasTags').innerHTML='<span class="tag tag-pur">'+active+' ativa'+(active!==1?'s':'')+'</span>'+(goals.filter(g=>g.done).length?'<span class="tag tag-ok">'+goals.filter(g=>g.done).length+' concluida'+(goals.filter(g=>g.done).length!==1?'s':'')+'</span>':'');
@@ -2237,7 +2309,13 @@ function renderMetas(){
 }
 
 function addGoal(){
-  if(U.plan!=='pro'){openMov('mPay');return;}
+  if(U.plan!=='pro'){
+    const goals=DB.get('g:'+U.email)||[];
+    if(goals.filter(g=>!g.done).length>=3){
+      toast('Free: max 3 metas ativas. Upgrade para PRO para metas ilimitadas','err');
+      return;
+    }
+  }
   const name=(document.getElementById('gName').value||'').trim();
   if(!name){toast('De um nome a meta','err');return;}
   DB.push('g:'+U.email,{id:Date.now(),name,days:+(document.getElementById('gDays').value)||30,cat:document.getElementById('gCat').value,date:hoje(),pct:0,done:false});
@@ -2420,10 +2498,15 @@ function openEditPerfil(){
   openMov('mEditPerfil');
 }
 
-function salvarPerfil(){
+async function salvarPerfil(){
   const nome=document.getElementById('editNome').value.trim();
   if(!nome){toast('Digite seu nome','err');return;}
   const saved=DB.get('u:'+U.email)||{};
+
+  // Detectar o que mudou para saber o que regenerar
+  const oldObj=U.objetivo, oldNivel=U.nivel, oldLocal=U.local, oldFreq=U.freq;
+  const oldPeso=U.peso, oldMeta=U.metaPeso;
+
   Object.assign(U,saved,{
     nome,peso:+document.getElementById('editPeso').value,
     metaPeso:+document.getElementById('editMeta').value,
@@ -2434,8 +2517,38 @@ function salvarPerfil(){
     onboarded:saved.onboarded??U.onboarded,plan:saved.plan??U.plan,email:U.email
   });
   DB.set('u:'+U.email,U);
-  atualizarPerfil(); renderHome(); renderTreino(); renderDieta();
-  closeMov('mEditPerfil'); toast('Perfil atualizado','ok');
+  atualizarPerfil(); renderHome();
+  closeMov('mEditPerfil');
+
+  // Regenerar planos se algo relevante mudou
+  const treinoMudou = U.objetivo!==oldObj || U.nivel!==oldNivel || U.local!==oldLocal || U.freq!==oldFreq;
+  const dietaMudou  = U.peso!==oldPeso || U.metaPeso!==oldMeta || U.objetivo!==oldObj;
+
+  if(U.plan==='pro' && (treinoMudou || dietaMudou)){
+    toast('Atualizando planos com IA...','ok');
+    try{
+      if(treinoMudou){
+        DB.del('w:'+U.email);
+        const treino=await gerarTreino();
+        DB.set('w:'+U.email,treino);
+        renderTreino();
+        toast('Treino atualizado!','ok');
+      }
+      if(dietaMudou){
+        DB.del('d:'+U.email);
+        const dieta=await gerarDieta();
+        DB.set('d:'+U.email,dieta);
+        renderDieta();
+        toast('Dieta atualizada!','ok');
+      }
+    }catch(e){
+      renderTreino(); renderDieta();
+      toast('Perfil salvo. Regenere o plano manualmente.','ok');
+    }
+  } else {
+    renderTreino(); renderDieta();
+    toast('Perfil atualizado','ok');
+  }
 }
 
 function refazerQuestionario(){
@@ -2487,8 +2600,23 @@ async function pedirPermissao(){
     if(perm==='granted'){
       document.getElementById('notifPermBlock').style.display='none';
       toast('Notificacoes ativadas!','ok');
+      // Capturar SW registration
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.ready.then(r=>{
+          window._swReg=r;
+          // Enviar notificação de boas-vindas via SW
+          r.showNotification('Evoluai ativado',{
+            body:'Voce recebera lembretes de treino, agua e refeicoes!',
+            icon: document.getElementById('_logoImg')?.src || '',
+            vibrate:[200,100,200]
+          }).catch(()=>{});
+        }).catch(()=>{
+          try{new Notification('Evoluai ativado',{body:'Notificacoes ativadas!'});}catch(e){}
+        });
+      } else {
+        try{new Notification('Evoluai ativado',{body:'Notificacoes ativadas!'});}catch(e){}
+      }
       iniciarNotificacoes();
-      setTimeout(()=>{if(typeof Notification!=='undefined'&&Notification.permission==='granted')new Notification('Evoluai ativado',{body:'Voce recebera lembretes de treino e agua.'});},500);
     } else {
       toast('Permissao negada','err');
     }
@@ -2502,7 +2630,23 @@ function saveNotif(){
 
 function enviarNotif(titulo,corpo){
   if(typeof Notification==='undefined'||Notification.permission!=='granted') return;
-  try{new Notification(titulo,{body:corpo,tag:'evo-'+Date.now(),vibrate:[200,100,200]});}catch(e){}
+  // Usar SW quando disponível (funciona em PWA instalado no Android)
+  const reg = window._swReg;
+  if(reg && reg.showNotification){
+    reg.showNotification(titulo,{
+      body:corpo,
+      tag:'evo-'+Date.now(),
+      icon: document.getElementById('_logoImg')?.src || '',
+      badge: document.getElementById('_logoImg')?.src || '',
+      vibrate:[200,100,200],
+      requireInteraction: false
+    }).catch(()=>{
+      try{new Notification(titulo,{body:corpo});}catch(e){}
+    });
+  } else {
+    // Fallback: Notification direta (funciona no browser normal)
+    try{new Notification(titulo,{body:corpo,tag:'evo-'+Date.now()});}catch(e){}
+  }
 }
 
 function iniciarNotificacoes(){
@@ -2691,6 +2835,7 @@ function doInstall(){
 }
 
 window.addEventListener('load',()=>{initPWA();});
+
 
 </script>
 </body>

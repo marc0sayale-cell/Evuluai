@@ -1,0 +1,58 @@
+{
+  "id": "https://marc0sayale-cell.github.io/rimu-io/",
+  "name": "Evoluai",
+  "short_name": "Evoluai",
+  "description": "Dieta, Treino, Financas e IA — sua evolucao comeca aqui.",
+  "start_url": "https://marc0sayale-cell.github.io/rimu-io/",
+  "scope": "https://marc0sayale-cell.github.io/rimu-io/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#100319",
+  "theme_color": "#673AB7",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "categories": [
+    "health",
+    "fitness",
+    "finance"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://marc0sayale-cell.github.io/rimu-io/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Evoluai App"
+    }
+  ]
+}

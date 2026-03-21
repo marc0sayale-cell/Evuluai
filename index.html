@@ -1307,7 +1307,7 @@ function choosePlan(plano) {
 //  ONBOARDING
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 function renderStep() {
-  document.querySelectorAll('.obStep').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
   document.getElementById('os'+obStep).classList.add('on');
   const pct = Math.round((obStep/7)*100);
   document.getElementById('obFill').style.width = pct+'%';
@@ -2234,6 +2234,61 @@ function showSavedRec(i){
   const hist=DB.get('rec:'+(U?.email||''))||[];
   const r=hist[i]; if(!r) return;
   if(typeof showRecipe==='function') showRecipe(r);
+}
+
+
+// ══════════════════════════════════════════════════════════════
+//  NOTIFICAÇÕES
+// ══════════════════════════════════════════════════════════════
+
+function pedirPermissaoAuto() {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission !== 'default') return;
+  DB.set('notif_asked', true);
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      toast('Notificações ativadas! 🔔', 'ok');
+      iniciarNotificacoes();
+    }
+  });
+}
+
+function iniciarNotificacoes() {
+  const cfg = DB.get('notif_cfg');
+  if (!cfg) return;
+  if (!navigator.serviceWorker?.controller) return;
+  navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_NOTIFS' });
+  const temAlguma = cfg.agua || cfg.treino || cfg.refeicao || cfg.peso;
+  if (temAlguma) {
+    navigator.serviceWorker.controller.postMessage({ type: 'SCHEDULE_NOTIFS', cfg });
+  }
+}
+
+function testarNotificacao() {
+  if (typeof Notification === 'undefined') { toast('Notificações não suportadas', 'err'); return; }
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') enviarTesteNotif();
+      else toast('Permissão negada', 'err');
+    });
+  } else {
+    enviarTesteNotif();
+  }
+}
+
+function enviarTesteNotif() {
+  if (navigator.serviceWorker?.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SHOW_NOTIF',
+      title: 'Evoluai 🚀',
+      body: 'Notificações funcionando!'
+    });
+    toast('Notificação enviada!', 'ok');
+  } else {
+    // Fallback direto
+    new Notification('Evoluai 🚀', { body: 'Notificações funcionando!' });
+    toast('Notificação enviada!', 'ok');
+  }
 }
 
 window.addEventListener('load',()=>{ initPWA(); checkiOS(); });

@@ -1,0 +1,50 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "EVOLUAI",
+          "size": "Small",
+          "weight": "Bolder",
+          "horizontalAlignment": "Center",
+          "color": "Accent",
+          "spacing": "Small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${pct}%",
+          "size": "Medium",
+          "weight": "Bolder",
+          "horizontalAlignment": "Center",
+          "color": "Accent",
+          "spacing": "None"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${kcal}",
+          "size": "ExtraLarge",
+          "weight": "Bolder",
+          "horizontalAlignment": "Center",
+          "color": "Accent",
+          "spacing": "None",
+          "fontType": "Monospace"
+        },
+        {
+          "type": "TextBlock",
+          "text": "/ ${meta} kcal",
+          "size": "Small",
+          "horizontalAlignment": "Center",
+          "color": "Light",
+          "spacing": "None"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

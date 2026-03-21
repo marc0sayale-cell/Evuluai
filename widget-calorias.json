@@ -1,0 +1,62 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "⚡",
+                  "size": "Medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "CALORIAS",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "fontType": "Monospace",
+                  "spacing": "None"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "text": "${kcal}",
+          "size": "ExtraLarge",
+          "weight": "Bolder",
+          "color": "Accent",
+          "fontType": "Monospace",
+          "spacing": "None"
+        },
+        {
+          "type": "TextBlock",
+          "text": "/ ${meta} kcal  ·  ${pct}%",
+          "size": "Small",
+          "color": "Light",
+          "spacing": "None",
+          "fontType": "Monospace"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

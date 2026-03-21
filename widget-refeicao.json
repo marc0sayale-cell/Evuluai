@@ -1,0 +1,113 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "🍽️",
+                  "size": "Medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${tipo}",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "fontType": "Monospace"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${kcalRef} kcal",
+                  "size": "Small",
+                  "color": "Accent",
+                  "fontType": "Monospace"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "text": "${nome}",
+          "size": "Large",
+          "weight": "Bolder",
+          "wrap": true,
+          "spacing": "Small"
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "P ${prot}g",
+                  "size": "Small",
+                  "color": "Accent",
+                  "weight": "Bolder",
+                  "fontType": "Monospace"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "C ${carbo}g",
+                  "size": "Small",
+                  "color": "Accent",
+                  "weight": "Bolder",
+                  "fontType": "Monospace"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "G ${gord}g",
+                  "size": "Small",
+                  "color": "Accent",
+                  "weight": "Bolder",
+                  "fontType": "Monospace"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

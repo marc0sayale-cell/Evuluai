@@ -1,0 +1,73 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "💪",
+                  "size": "Medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "TREINO HOJE",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "fontType": "Monospace"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${feito ? '✓ FEITO' : 'PENDENTE'}",
+                  "size": "Small",
+                  "color": "Accent",
+                  "fontType": "Monospace"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "text": "${nome}",
+          "size": "Large",
+          "weight": "Bolder",
+          "wrap": true,
+          "spacing": "Small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "⏱ ${duracao} min  ·  🏋️ ${exer} exercícios",
+          "size": "Small",
+          "color": "Light",
+          "spacing": "None",
+          "fontType": "Monospace"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

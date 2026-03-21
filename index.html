@@ -1307,13 +1307,20 @@ function choosePlan(plano) {
 //  ONBOARDING
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 function renderStep() {
-  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
-  document.getElementById('os'+obStep).classList.add('on');
-  const pct = Math.round((obStep/7)*100);
-  document.getElementById('obFill').style.width = pct+'%';
-  document.getElementById('obLbl').textContent  = `Passo ${obStep} de 7`;
-  document.getElementById('obPct').textContent  = pct+'%';
-  document.getElementById('obNx').textContent   = obStep===7 ? '\ud83d\ude80 Gerar meu plano!' : 'Continuar \u2192';
+  document.querySelectorAll('.ob-step').forEach(function(s){ s.classList.remove('on'); });
+  var el = document.getElementById('os'+obStep);
+  if(el) el.classList.add('on');
+  var pct = Math.round((obStep/7)*100);
+  var fill = document.getElementById('obFill');
+  var lbl  = document.getElementById('obLbl');
+  var pctEl= document.getElementById('obPct');
+  var btn  = document.getElementById('obNx');
+  if(fill) fill.style.width = pct+'%';
+  if(lbl)  lbl.textContent  = 'Passo '+obStep+' de 7';
+  if(pctEl)pctEl.textContent= pct+'%';
+  if(btn)  btn.textContent  = obStep===7 ? 'Gerar meu plano!' : 'Continuar';
+  var body = document.querySelector('.ob-body');
+  if(body) body.scrollTop = 0;
 }
 
 function obNext() {
@@ -2289,6 +2296,99 @@ function enviarTesteNotif() {
     new Notification('Evoluai 🚀', { body: 'Notificações funcionando!' });
     toast('Notificação enviada!', 'ok');
   }
+}
+
+
+// ══════════════════════════════════════════════════════════════
+//  WIDGETS — envia dados reais para os widgets Android
+// ══════════════════════════════════════════════════════════════
+function updateWidgets() {
+  if (!navigator.serviceWorker?.controller) return;
+  if (!U?.email) return;
+
+  // Kcal de hoje
+  const hoje = new Date().toISOString().split('T')[0];
+  const logHoje = DB.get('log:' + U.email + ':' + hoje) || [];
+  const kcalHoje = logHoje.reduce((s, r) => s + (r.kcal || 0), 0);
+  const dieta = DB.get('d:' + U.email);
+  const metaKcal = dieta?.meta_kcal || 2200;
+
+  // Treino de hoje
+  const treino = DB.get('w:' + U.email);
+  const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+  const diaHoje = diasSemana[new Date().getDay()];
+  let treinoHoje = null;
+  if (treino?.dias) {
+    const d = treino.dias.find(d => d.dia === diaHoje || d.dia?.startsWith(diaHoje));
+    if (d) treinoHoje = { nome: d.nome || d.grupo || 'Treino', duracao: d.duracao || 45, exer: d.exercicios?.length || 0, feito: DB.get('treino_feito:' + hoje) || false };
+  }
+
+  // Saldo financeiro
+  const txs = DB.get('txs:' + U.email) || [];
+  const mesAtual = hoje.substring(0, 7);
+  const saldoMes = txs.filter(t => (t.data||'').startsWith(mesAtual)).reduce((s, t) => s + (t.tipo === 'entrada' ? t.valor : -t.valor), 0);
+
+  // Próxima refeição
+  let proximaRef = null;
+  if (dieta?.dias?.length) {
+    const diaIdx = new Date().getDay();
+    const diaPlano = dieta.dias[diaIdx % dieta.dias.length];
+    const agora = new Date();
+    const minAgora = agora.getHours() * 60 + agora.getMinutes();
+    const horarios = { 'Café da manhã': 8*60, 'Almoço': 12*60+30, 'Lanche': 15*60, 'Jantar': 19*60 };
+    if (diaPlano?.ref) {
+      for (const ref of diaPlano.ref) {
+        const hr = horarios[ref.tipo] || 12*60;
+        if (hr > minAgora) { proximaRef = ref; break; }
+      }
+      if (!proximaRef) proximaRef = diaPlano.ref[0];
+    }
+  }
+
+  // Frase do dia
+  const frases = [
+    'Cada treino te aproxima do seu melhor eu! 💪',
+    'Consistência é a chave. Continue! 🔑',
+    'Seu único concorrente é quem você foi ontem. 🚀',
+    'Pequenos passos todos os dias = grandes resultados! 🎯',
+    'A disciplina de hoje é a conquista de amanhã. ⭐',
+    'Você é mais forte do que pensa! 💥',
+    'Foco no processo, os resultados vêm naturalmente. 🌱',
+    'Não pare quando estiver cansado, pare quando terminar. 🏆',
+  ];
+  const frase = frases[new Date().getDay() % frases.length];
+
+  // Enviar para o SW
+  navigator.serviceWorker.controller.postMessage({
+    type: 'UPDATE_WIDGETS',
+    kcal: kcalHoje,
+    metaKcal,
+    treino: treinoHoje,
+    saldo: saldoMes.toFixed(2),
+    proximaRefeicao: proximaRef,
+    frase
+  });
+
+  // Atualizar widget-data.json via fetch (para widgets estáticos)
+  const widgetData = {
+    kcal: kcalHoje,
+    meta: metaKcal,
+    pct: Math.min(100, Math.round((kcalHoje / metaKcal) * 100)),
+    nome: treinoHoje?.nome || 'Descanso',
+    duracao: treinoHoje?.duracao || 0,
+    exer: treinoHoje?.exer || 0,
+    feito: treinoHoje?.feito || false,
+    saldo: Math.abs(saldoMes).toFixed(0),
+    positivo: saldoMes >= 0,
+    frase,
+    prot: proximaRef?.prot || 0,
+    carbo: proximaRef?.carbo || 0,
+    gord: proximaRef?.gord || 0,
+    tipo: proximaRef?.tipo || '',
+    kcalRef: proximaRef?.kcal || 0
+  };
+  // Guardar no localStorage para referência
+  DB.set('widget_data_cache', widgetData);
 }
 
 window.addEventListener('load',()=>{ initPWA(); checkiOS(); });

@@ -1,4 +1,4 @@
-const CACHE = 'evo-v8';
+const CACHE = 'evo-v9';
 const SKIP = ['api.groq', 'api.anthropic', 'firebase', 'googleapis', 'workers.dev', 'cloudflare'];
 
 self.addEventListener('install', e => {
@@ -167,3 +167,161 @@ self.addEventListener('notificationclick', e => {
     })
   );
 });
+
+// ─── WIDGETS ────────────────────────────────────────────────────────────────
+// PWA Widgets API (Chrome experimental / Android 12+)
+// Quando disponível, aparece na tela inicial como widget nativo
+
+const WIDGET_TEMPLATES = {
+  calorias: {
+    name: 'Evoluai — Calorias',
+    description: 'Calorias consumidas hoje',
+    tag: 'evoluai-calorias',
+    ms_ac_template: 'evoluai-calorias.json',
+    data: 'evoluai-calorias-data.json',
+    screenshots: [{ src: './icon-512-1.png', sizes: '512x512' }],
+    icons: [{ src: './icon-192.png', sizes: '192x192' }],
+    backgrounds: ['#100319'],
+    multiple: false
+  },
+  treino: {
+    name: 'Evoluai — Treino',
+    description: 'Treino do dia',
+    tag: 'evoluai-treino',
+    ms_ac_template: 'evoluai-treino.json',
+    data: 'evoluai-treino-data.json',
+    screenshots: [{ src: './icon-512-1.png', sizes: '512x512' }],
+    icons: [{ src: './icon-192.png', sizes: '192x192' }],
+    backgrounds: ['#100319'],
+    multiple: false
+  },
+  financas: {
+    name: 'Evoluai — Finanças',
+    description: 'Saldo financeiro',
+    tag: 'evoluai-financas',
+    ms_ac_template: 'evoluai-financas.json',
+    data: 'evoluai-financas-data.json',
+    screenshots: [{ src: './icon-512-1.png', sizes: '512x512' }],
+    icons: [{ src: './icon-192.png', sizes: '192x192' }],
+    backgrounds: ['#100319'],
+    multiple: false
+  },
+  motivacao: {
+    name: 'Evoluai — Motivação',
+    description: 'Frase motivadora do dia',
+    tag: 'evoluai-motivacao',
+    ms_ac_template: 'evoluai-motivacao.json',
+    data: 'evoluai-motivacao-data.json',
+    screenshots: [{ src: './icon-512-1.png', sizes: '512x512' }],
+    icons: [{ src: './icon-192.png', sizes: '192x192' }],
+    backgrounds: ['#100319'],
+    multiple: false
+  },
+  refeicao: {
+    name: 'Evoluai — Próxima Refeição',
+    description: 'O que comer agora',
+    tag: 'evoluai-refeicao',
+    ms_ac_template: 'evoluai-refeicao.json',
+    data: 'evoluai-refeicao-data.json',
+    screenshots: [{ src: './icon-512-1.png', sizes: '512x512' }],
+    icons: [{ src: './icon-192.png', sizes: '192x192' }],
+    backgrounds: ['#100319'],
+    multiple: false
+  }
+};
+
+// Registrar widgets quando API disponível
+self.addEventListener('activate', e => {
+  if ('widgets' in self) {
+    e.waitUntil(
+      Promise.all(
+        Object.values(WIDGET_TEMPLATES).map(t =>
+          self.widgets.getByTag(t.tag).then(w => {
+            if (!w) return self.widgets.updateByTag(t.tag, { template: t });
+          }).catch(() => {})
+        )
+      )
+    );
+  }
+});
+
+// Frases motivadoras
+const FRASES = [
+  'Cada treino te aproxima do seu melhor eu! 💪',
+  'Consistência é a chave. Continue! 🔑',
+  'Seu único concorrente é quem você foi ontem. 🚀',
+  'Pequenos passos todos os dias = grandes resultados! 🎯',
+  'A disciplina de hoje é a conquista de amanhã. ⭐',
+  'Você é mais forte do que pensa! 💥',
+  'Foco no processo, os resultados vêm naturalmente. 🌱',
+  'Não pare quando estiver cansado, pare quando terminar. 🏆',
+];
+
+function getFrasesDia() {
+  const dia = new Date().getDay();
+  return FRASES[dia % FRASES.length];
+}
+
+// Atualizar dados dos widgets via postMessage
+self.addEventListener('message', e => {
+  if (!e.data) return;
+
+  if (e.data.type === 'UPDATE_WIDGETS') {
+    const { kcal, metaKcal, treino, saldo, proximaRefeicao } = e.data;
+
+    if (!('widgets' in self)) return; // API não disponível
+
+    const updates = [
+      {
+        tag: 'evoluai-calorias',
+        data: {
+          kcal: kcal || 0,
+          meta: metaKcal || 2200,
+          pct: Math.min(100, Math.round(((kcal||0)/(metaKcal||2200))*100)),
+          label: 'Calorias Hoje',
+          cor: '#e040fb'
+        }
+      },
+      {
+        tag: 'evoluai-treino',
+        data: {
+          nome: treino?.nome || 'Sem treino hoje',
+          tipo: treino?.tipo || 'descanso',
+          duracao: treino?.duracao || 0,
+          feito: treino?.feito || false,
+          label: 'Treino de Hoje'
+        }
+      },
+      {
+        tag: 'evoluai-financas',
+        data: {
+          saldo: saldo || 0,
+          positivo: (saldo || 0) >= 0,
+          label: 'Saldo'
+        }
+      },
+      {
+        tag: 'evoluai-motivacao',
+        data: {
+          frase: getFrasesDia(),
+          label: 'Motivação'
+        }
+      },
+      {
+        tag: 'evoluai-refeicao',
+        data: {
+          nome: proximaRefeicao?.nome || 'Nenhuma refeição',
+          kcal: proximaRefeicao?.kcal || 0,
+          tipo: proximaRefeicao?.tipo || '',
+          label: 'Próxima Refeição'
+        }
+      }
+    ];
+
+    updates.forEach(u => {
+      self.widgets.updateByTag(u.tag, { data: JSON.stringify(u.data) }).catch(() => {});
+    });
+  }
+});
+
+self.addEventListener('message',e=>{ if(e.data&&e.data.type==='SKIP_WAITING') self.skipWaiting(); });

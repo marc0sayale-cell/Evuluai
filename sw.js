@@ -322,6 +322,10 @@ self.addEventListener('message', e => {
       self.widgets.updateByTag(u.tag, { data: JSON.stringify(u.data) }).catch(() => {});
     });
   }
-});
 
-self.addEventListener('message',e=>{ if(e.data&&e.data.type==='SKIP_WAITING') self.skipWaiting(); });
+  // Auto-update
+  if (e.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    return;
+  }
+});

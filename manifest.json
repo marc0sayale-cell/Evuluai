@@ -54,5 +54,122 @@
       "form_factor": "narrow",
       "label": "Evoluai"
     }
+  ],
+  "widgets": [
+    {
+      "name": "Calorias Hoje",
+      "description": "Calorias consumidas no dia",
+      "tag": "evoluai-calorias",
+      "ms_ac_template": "widget-calorias.json",
+      "data": "widget-data.json",
+      "screenshots": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-512-1.png",
+          "sizes": "512x512"
+        }
+      ],
+      "icons": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "backgrounds": [
+        "#141414"
+      ],
+      "multiple": false
+    },
+    {
+      "name": "Treino de Hoje",
+      "description": "Seu treino programado para hoje",
+      "tag": "evoluai-treino",
+      "ms_ac_template": "widget-treino.json",
+      "data": "widget-data.json",
+      "screenshots": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-512-1.png",
+          "sizes": "512x512"
+        }
+      ],
+      "icons": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "backgrounds": [
+        "#141414"
+      ],
+      "multiple": false
+    },
+    {
+      "name": "Saldo Financeiro",
+      "description": "Seu saldo atual",
+      "tag": "evoluai-financas",
+      "ms_ac_template": "widget-financas.json",
+      "data": "widget-data.json",
+      "screenshots": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-512-1.png",
+          "sizes": "512x512"
+        }
+      ],
+      "icons": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "backgrounds": [
+        "#141414"
+      ],
+      "multiple": false
+    },
+    {
+      "name": "Motivação",
+      "description": "Frase motivadora do dia",
+      "tag": "evoluai-motivacao",
+      "ms_ac_template": "widget-motivacao.json",
+      "data": "widget-data.json",
+      "screenshots": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-512-1.png",
+          "sizes": "512x512"
+        }
+      ],
+      "icons": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "backgrounds": [
+        "#141414"
+      ],
+      "multiple": false
+    },
+    {
+      "name": "Próxima Refeição",
+      "description": "O que comer agora",
+      "tag": "evoluai-refeicao",
+      "ms_ac_template": "widget-refeicao.json",
+      "data": "widget-data.json",
+      "screenshots": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-512-1.png",
+          "sizes": "512x512"
+        }
+      ],
+      "icons": [
+        {
+          "src": "https://marc0sayale-cell.github.io/Evuluai/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "backgrounds": [
+        "#141414"
+      ],
+      "multiple": false
+    }
   ]
 }

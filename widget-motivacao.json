@@ -1,0 +1,61 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "✨",
+                  "size": "Medium"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "MOTIVACAO",
+                  "size": "Small",
+                  "weight": "Bolder",
+                  "color": "Accent",
+                  "fontType": "Monospace"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "text": "${frase}",
+          "size": "Medium",
+          "weight": "Bolder",
+          "wrap": true,
+          "italic": true,
+          "spacing": "Small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Evoluai ⚡",
+          "size": "Small",
+          "color": "Accent",
+          "fontType": "Monospace",
+          "spacing": "Small"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

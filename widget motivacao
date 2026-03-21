@@ -1,0 +1,48 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "bleed": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "❝",
+          "size": "ExtraLarge",
+          "color": "Accent",
+          "spacing": "Small"
+        },
+        {
+          "type": "TextBlock",
+          "text": "${frase}",
+          "size": "Medium",
+          "weight": "Bolder",
+          "wrap": true,
+          "isSubtle": false,
+          "spacing": "None",
+          "style": "default",
+          "italic": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "❞",
+          "size": "ExtraLarge",
+          "color": "Accent",
+          "horizontalAlignment": "Right",
+          "spacing": "None"
+        },
+        {
+          "type": "TextBlock",
+          "text": "⚡ Evoluai · hoje",
+          "size": "Small",
+          "color": "Accent",
+          "spacing": "Small",
+          "fontType": "Monospace"
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

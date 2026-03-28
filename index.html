@@ -1280,17 +1280,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (saved && saved.nome) {
       U = saved;
-      if (U.email === MASTER.email || (typeof PRO_ACCOUNTS !== 'undefined' && PRO_ACCOUNTS.includes(U.email))) {
-        U.plan = 'pro';
-      }
-      if (saved.onboarded) {
-        iniciarApp();
-      } else if (saved.plan) {
-        mostrar('pgOb');
-        setTimeout(function(){ if(typeof renderStep === 'function') renderStep(); }, 100);
-      } else {
-        mostrar('pgPlan');
-      }
+      if (U.email === MASTER.email || PRO_ACCOUNTS.includes(U.email)) U.plan = 'pro';
+      if (saved.onboarded) { iniciarApp(); }
+      else if (saved.plan) { mostrar('pgOb'); setTimeout(renderStep, 100); }
+      else { mostrar('pgPlan'); }
     } else {
       mostrar('pgAuth');
     }
@@ -2569,7 +2562,7 @@ function salvarPerfil(){
   if(U){Object.assign(U,{nome,peso,meta,metaPeso:meta});}
   atualizarPerfil();closeMov();toast('Perfil atualizado!','ok');
 }
-function openNotifSettings_OLD_DISABLED(){
+function openNotifSettings(){
   var cfg=DB.get('notif_cfg')||{};
   var html='<div style="padding:8px 0">';
   html+='<div style="font-size:18px;font-weight:800;margin-bottom:16px;font-family:Inter,sans-serif">Notificacoes</div>';
@@ -2595,11 +2588,12 @@ function openNotifSettings_OLD_DISABLED(){
 
 
 function escolherPlano(plan) {
+  if(!U) U = {};
   U.plan = plan;
-  DB.set('u:'+U.email, U);
+  if(U.email) DB.set('u:'+U.email, U);
   mostrar('pgOb');
   obStep = 1;
-  if(typeof renderStep === 'function') renderStep();
+  renderStep();
 }
 
 function addMsg(role, text) {
@@ -2607,10 +2601,8 @@ function addMsg(role, text) {
   if(!msgs) return;
   var div = document.createElement('div');
   div.className = 'msg ' + (role==='user' ? 'msg-u' : 'msg-a');
-  var now = new Date();
-  var t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  div.innerHTML = (role==='ai' ? '<div class="ai-av">IA</div>' : '') +
-    '<div class="msg-b">'+text+'</div><div class="msg-t">'+t+'</div>';
+  var t = new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0');
+  div.innerHTML = (role==='ai'?'<div class="ai-av">IA</div>':'')+'<div class="msg-b">'+text+'</div><div class="msg-t">'+t+'</div>';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -2624,32 +2616,27 @@ async function sendChat() {
   inp.value = '';
   addMsg('user', msg);
   var msgs = document.getElementById('chatMsgs');
-  var typing = document.createElement('div');
-  typing.className = 'msg msg-a';
-  typing.id = 'typingMsg';
-  typing.innerHTML = '<div class="ai-av">IA</div><div class="msg-b" style="color:var(--dim)">...</div>';
-  if(msgs){ msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight; }
+  var t = document.createElement('div');
+  t.className='msg msg-a'; t.id='typingMsg';
+  t.innerHTML='<div class="ai-av">IA</div><div class="msg-b" style="color:var(--dim)">...</div>';
+  if(msgs){ msgs.appendChild(t); msgs.scrollTop=msgs.scrollHeight; }
   try {
-    var resp = await callAI('Voce e o assistente do Evoluai. Responda em portugues de forma direta. Usuario: '+JSON.stringify({nome:U.nome,peso:U.peso,objetivo:U.objetivo}), msg, 400);
-    typing.remove();
-    addMsg('ai', resp||'Nao consegui responder agora.');
-  } catch(e) {
-    typing.remove();
-    addMsg('ai', 'Erro de conexao. Tente novamente.');
-  }
+    var r = await callAI('Assistente Evoluai. Responda em portugues.', msg, 400);
+    t.remove(); addMsg('ai', r||'Sem resposta.');
+  } catch(e) { t.remove(); addMsg('ai', 'Erro de conexao.'); }
 }
 
 function openNotifSettings(){
   var cfg=DB.get('notif_cfg')||{};
-  var html='<div style="padding:8px 0"><div style="font-size:18px;font-weight:800;margin-bottom:16px">Notificacoes</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px;font-weight:500">Agua (2h)</span><label class="ntoggle"><input type="checkbox" id="ntAgua"'+(cfg.agua?' checked':'')+'>  <span class="nslider"></span></label></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px;font-weight:500">Treino</span><label class="ntoggle"><input type="checkbox" id="ntTreino"'+(cfg.treino?' checked':'')+'>  <span class="nslider"></span></label></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px;font-weight:500">Refeicoes</span><label class="ntoggle"><input type="checkbox" id="ntRefeicao"'+(cfg.refeicao?' checked':'')+'>  <span class="nslider"></span></label></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0"><span style="font-size:15px;font-weight:500">Peso</span><label class="ntoggle"><input type="checkbox" id="ntPeso"'+(cfg.peso?' checked':'')+'>  <span class="nslider"></span></label></div>';
-  html+='<button onclick="saveNotif()" class="btn-p" style="margin-top:16px">Salvar</button>';
-  html+='<button onclick="testarNotificacao()" class="btn-o" style="margin-top:8px">Testar agora</button></div>';
-  var mb=document.getElementById('movBody');
-  if(mb) mb.innerHTML=html;
+  var h='<div style="padding:8px 0">';
+  h+='<div style="font-size:18px;font-weight:800;margin-bottom:16px">Notificacoes</div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)"><span>Agua (2h)</span><label class="ntoggle"><input type="checkbox" id="ntAgua"'+(cfg.agua?' checked':'')+'>  <span class="nslider"></span></label></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)"><span>Treino</span><label class="ntoggle"><input type="checkbox" id="ntTreino"'+(cfg.treino?' checked':'')+'>  <span class="nslider"></span></label></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)"><span>Refeicoes</span><label class="ntoggle"><input type="checkbox" id="ntRefeicao"'+(cfg.refeicao?' checked':'')+'>  <span class="nslider"></span></label></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:14px 0"><span>Peso</span><label class="ntoggle"><input type="checkbox" id="ntPeso"'+(cfg.peso?' checked':'')+'>  <span class="nslider"></span></label></div>';
+  h+='<button onclick="saveNotif()" class="btn-p" style="margin-top:16px">Salvar</button>';
+  h+='<button onclick="testarNotificacao()" class="btn-o" style="margin-top:8px">Testar</button></div>';
+  var mb=document.getElementById('movBody'); if(mb) mb.innerHTML=h;
   openMov('mGeneric');
 }
 
